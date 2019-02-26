@@ -1,0 +1,29 @@
+<html>
+    <body>
+        #{include header.html}
+		<p>A: #{a}</p>
+		<p>B: #{b}</p>
+		#{!eq a 2}
+			<p>C: #{c}</p>
+		#{end}
+		#{eq a 1}	
+			<p>E: #{d.e}</p>
+		#{end}
+		<table>
+			#{for row : table}
+				#{!eq row.second false}			
+					<tr>
+						<td>#{row.first}</td>
+						<td>#{row.second}</td>
+						<td>#{row.third}</td>
+					</tr>
+				#{end}		
+			#{end}
+		</table>
+		#{for row : table}
+			#{for cell : row}
+				<li> #{cell}
+			#{end}		
+		#{end}		
+    </body>
+</html>

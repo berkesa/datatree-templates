@@ -1,0 +1,117 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'com.bmuschko.nexus'
+apply plugin: 'jacoco'
+
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
+    }
+}
+
+// --- JAVADOC ---
+
+javadoc {
+	failOnError = true
+}
+
+// --- JACOCO ---
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled true
+    }
+}
+
+// --- CONFIGURATIONS ---
+
+configurations {
+    runtime
+    ecj
+}
+
+configurations.all {
+    // resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+// --- REPOSITORIES ---
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+}
+
+// --- DEPENDENCIES ---
+
+dependencies {
+    testCompile 'junit:junit:4.12'
+	ecj 'org.eclipse.jdt.core.compiler:ecj:4.4.2'
+
+	// ================== DATATREE CORE =======================
+	    
+    // https://mvnrepository.com/artifact/com.github.berkesa/datatree-core
+	compile group: 'com.github.berkesa', name: 'datatree-core', version: '1.0.9'
+	
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+group = 'com.github.berkesa'
+
+version = '1.0.1'
+  
+modifyPom {
+    project {
+        artifactId 'datatree-templates'
+        name 'DataTree Templates'
+        description 'Template Engine based on DataTree API.'
+        url 'https://berkesa.github.io/datatree-templates/'
+        inceptionYear '2017'
+
+        scm {
+            url 'https://berkesa.github.io/datatree-templates/'
+            connection 'scm:https://github.com/berkesa/datatree-templates.git'
+            developerConnection 'scm:git://github.com/berkesa/datatree-templates.git'
+        }
+
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
+        
+        dependencies {
+            dependency {
+                groupId 'com.github.berkesa'
+                artifactId 'datatree-core'
+                version '1.0.9'
+                scope 'runtime'
+            }        
+        }
+
+        developers {
+            developer {
+                id 'berkesa'
+                name 'Andras Berkes'
+                email 'andras.berkes@programmer.net'
+            }
+        }
+    }
+}
+
+nexus {
+    sign = true
+    repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+	snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots'
+}
+

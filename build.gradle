@@ -59,6 +59,14 @@ dependencies {
     // https://mvnrepository.com/artifact/com.github.berkesa/datatree-core
 	compile group: 'com.github.berkesa', name: 'datatree-core', version: '1.0.9'
 	
+	// ============= HTML/CSS/JS COMPRESSOR ===================
+	
+	// https://mvnrepository.com/artifact/com.googlecode.htmlcompressor/htmlcompressor
+	compile group: 'com.googlecode.htmlcompressor', name: 'htmlcompressor', version: '1.5.2'
+	
+	// https://mvnrepository.com/artifact/com.yahoo.platform.yui/yuicompressor
+	compile group: 'com.yahoo.platform.yui', name: 'yuicompressor', version: '2.4.8'
+	
 }
 
 sourceCompatibility = 1.8

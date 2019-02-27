@@ -1,7 +1,7 @@
 /**
  * This software is licensed under the Apache 2 license, quoted below.<br>
  * <br>
- * Copyright 2018 Andras Berkes [andras.berkes@programmer.net]<br>
+ * Copyright 2019 Andras Berkes [andras.berkes@programmer.net]<br>
  * <br>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,7 +120,7 @@ import io.datatree.dom.Cache;
  * The administrator email address is not specified.<br>
  * #{end}<br>
  */
-public class TemplateEngine {
+public class TemplateEngine implements FragmentTypes {
 
 	// --- VARIABLES ---
 
@@ -163,7 +163,7 @@ public class TemplateEngine {
 	 * Optional HTML pre-processor (eg. HTML minifier).
 	 */
 	protected Function<String, String> templatePreProcessor;
-	
+
 	// --- CONSTRUCTORS ---
 
 	public TemplateEngine() {
@@ -174,12 +174,42 @@ public class TemplateEngine {
 		cache = new Cache<>(cacheSize);
 	}
 
-	// --- TRANSFORM METHODS ---
+	// --- PUBLIC PAGE-GENERATOR METHODS ---
 
+	/**
+	 * Executes template, using the Map-based data model provided, then
+	 * returning the result in a byte-array.
+	 * 
+	 * @param templatePath
+	 *            relative path to template with extension (eg. "index.html" or
+	 *            "admin/login.html")
+	 * @param data
+	 *            data model as Map
+	 * 
+	 * @return rendered template in a byte array
+	 * 
+	 * @throws Exception
+	 *             any I/O or syntax exteption
+	 */
 	public byte[] process(String templatePath, Map<String, Object> data) throws Exception {
 		return process(templatePath, new Tree(data));
 	}
 
+	/**
+	 * Executes template, using the Tree-based data model provided, then
+	 * returning the result in a byte-array.
+	 * 
+	 * @param templatePath
+	 *            relative path to template with extension (eg. "index.html" or
+	 *            "admin/login.html")
+	 * @param data
+	 *            data model as Tree
+	 * 
+	 * @return rendered template in a byte array
+	 * 
+	 * @throws Exception
+	 *             any I/O or syntax exteption
+	 */
 	public byte[] process(String templatePath, Tree data) throws IOException {
 		ByteArrayOutputStream stream = new ByteArrayOutputStream(writeBufferSize);
 		String path = getAbsolutePath(templatePath);
@@ -187,10 +217,40 @@ public class TemplateEngine {
 		return stream.toByteArray();
 	}
 
+	/**
+	 * Executes template, using the Map-based data model provided, then
+	 * returning the result as String.
+	 * 
+	 * @param templatePath
+	 *            relative path to template with extension (eg. "index.html" or
+	 *            "admin/login.html")
+	 * @param data
+	 *            data model as Map
+	 * 
+	 * @return rendered template as String
+	 * 
+	 * @throws Exception
+	 *             any I/O or syntax exteption
+	 */
 	public String processToString(String templatePath, Map<String, Object> data) throws Exception {
 		return processToString(templatePath, new Tree(data));
 	}
 
+	/**
+	 * Executes template, using the Tree-based data model provided, then
+	 * returning the result as String.
+	 * 
+	 * @param templatePath
+	 *            relative path to template with extension (eg. "index.html" or
+	 *            "admin/login.html")
+	 * @param data
+	 *            data model as Tree
+	 * 
+	 * @return rendered template as String
+	 * 
+	 * @throws Exception
+	 *             any I/O or syntax exteption
+	 */
 	public String processToString(String templatePath, Tree data) throws Exception {
 		StringBuilder builder = new StringBuilder(writeBufferSize);
 		String path = getAbsolutePath(templatePath);
@@ -199,7 +259,7 @@ public class TemplateEngine {
 	}
 
 	// --- PROTECTED METHODS ---
-	
+
 	protected Fragment getTemplate(String templatePath) throws IOException {
 		Fragment template = cache.get(templatePath);
 		boolean loadable = template == null;
@@ -215,7 +275,7 @@ public class TemplateEngine {
 			}
 			long lastModified = loader.lastModified(templatePath);
 			template = FragmentBuilder.compile(source, templatePath, lastModified, charset);
-			cache.put(templatePath, template);			
+			cache.put(templatePath, template);
 		}
 		return template;
 	}
@@ -236,13 +296,13 @@ public class TemplateEngine {
 					break;
 				}
 			}
-		}	
+		}
 		switch (command.type) {
-		case (Fragment.STATIC_TEXT):
+		case STATIC_TEXT:
 			builder.append(command.content);
 			break;
 
-		case (Fragment.INSERTABLE_VARIABLE):
+		case INSERTABLE_VARIABLE:
 			String value = current.get(path, "");
 			if (value != null && !value.isEmpty()) {
 				if (escapeSpecialCharacters) {
@@ -253,7 +313,7 @@ public class TemplateEngine {
 			}
 			break;
 
-		case (Fragment.FOR_CYCLE):
+		case FOR_CYCLE:
 			if (variables == null) {
 				variables = new HashMap<String, Tree>();
 			}
@@ -264,39 +324,40 @@ public class TemplateEngine {
 			variables = null;
 			return;
 
-		case (Fragment.CONDITION_TAG_EXISTS):
+		case CONDITION_TAG_EXISTS:
 			if (current.get(path) == null) {
 				return;
 			}
 			break;
 
-		case (Fragment.CONDITION_TAG_NOT_EXISTS):
+		case CONDITION_TAG_NOT_EXISTS:
 			if (current.get(path) == null) {
 				break;
 			}
 			return;
 
-		case (Fragment.CONDITION_TAG_VALUE_EQUALS):
+		case CONDITION_TAG_VALUE_EQUALS:
 			value = current.get(path, "");
 			if (value.equals(command.content)) {
 				break;
 			}
 			return;
 
-		case (Fragment.CONDITION_TAG_VALUE_NOT_EQUALS):
+		case CONDITION_TAG_VALUE_NOT_EQUALS:
 			value = current.get(path, "");
 			if (value.equals(command.content)) {
 				return;
 			}
 			break;
 
-		case (Fragment.INSERTABLE_TEMPLATE_FILE):
+		case INSERTABLE_TEMPLATE_FILE:
 			String subTemplatePath = getAbsolutePath(basePath, command.arg);
 			Fragment include = getTemplate(subTemplatePath);
 			if (include == null) {
 				return;
 			}
 			transform(subTemplatePath, builder, include, root, variables);
+		default:
 			break;
 		}
 		transformChildren(basePath, builder, command, root, variables);
@@ -318,13 +379,13 @@ public class TemplateEngine {
 					break;
 				}
 			}
-		}		
+		}
 		switch (command.type) {
-		case (Fragment.STATIC_TEXT):
+		case STATIC_TEXT:
 			stream.write(command.body);
 			break;
 
-		case (Fragment.INSERTABLE_VARIABLE):
+		case INSERTABLE_VARIABLE:
 			String value = current.get(path, "");
 			if (value != null && !value.isEmpty()) {
 				if (escapeSpecialCharacters) {
@@ -335,7 +396,7 @@ public class TemplateEngine {
 			}
 			break;
 
-		case (Fragment.FOR_CYCLE):
+		case FOR_CYCLE:
 			if (variables == null) {
 				variables = new HashMap<String, Tree>();
 			}
@@ -346,39 +407,40 @@ public class TemplateEngine {
 			variables = null;
 			return;
 
-		case (Fragment.CONDITION_TAG_EXISTS):
+		case CONDITION_TAG_EXISTS:
 			if (current.get(path) == null) {
 				return;
 			}
 			break;
 
-		case (Fragment.CONDITION_TAG_NOT_EXISTS):
+		case CONDITION_TAG_NOT_EXISTS:
 			if (current.get(path) == null) {
 				break;
 			}
 			return;
 
-		case (Fragment.CONDITION_TAG_VALUE_EQUALS):
+		case CONDITION_TAG_VALUE_EQUALS:
 			value = current.get(path, "");
 			if (value.equals(command.content)) {
 				break;
 			}
 			return;
 
-		case (Fragment.CONDITION_TAG_VALUE_NOT_EQUALS):
+		case CONDITION_TAG_VALUE_NOT_EQUALS:
 			value = current.get(path, "");
 			if (value.equals(command.content)) {
 				return;
 			}
 			break;
 
-		case (Fragment.INSERTABLE_TEMPLATE_FILE):
+		case INSERTABLE_TEMPLATE_FILE:
 			String subTemplatePath = getAbsolutePath(basePath, command.arg);
 			Fragment include = getTemplate(subTemplatePath);
 			if (include == null) {
 				return;
 			}
 			transform(subTemplatePath, stream, include, root, variables);
+		default:
 			break;
 		}
 		transformChildren(basePath, stream, command, root, variables);
@@ -450,7 +512,7 @@ public class TemplateEngine {
 		}
 		return rootDirectory + '/' + path;
 	}
-	
+
 	protected String getAbsolutePath(String basePath, String relativePath) {
 		try {
 			if (relativePath != null) {

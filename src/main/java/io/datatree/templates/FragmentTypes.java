@@ -18,37 +18,35 @@
 package io.datatree.templates;
 
 /**
- * A document-fragment (root tag, and sub-fragments).
+ * Fragment types.
  */
-public class Fragment {
+public interface FragmentTypes {
 
-	// --- VARIABLES ---
+	// Root element
+	public static final byte ROOT = 0;
 
-	/**
-	 * Type of fragment.
-	 */
-	public byte type;
+	// Static text
+	public static final byte STATIC_TEXT = 1;
 
-	/**
-	 * First argument.
-	 */
-	public String arg;
+	// #{variable}
+	public static final byte INSERTABLE_VARIABLE = 2;
 
-	/**
-	 * Content or second argument.
-	 */
-	public String content;
+	// #{ex variable}
+	public static final byte CONDITION_TAG_EXISTS = 3;
 
-	/**
-	 * Encoded content (eg. in UTF-8 format).
-	 */
-	public byte[] body;
-	
-	// --- SUB-FRAGMENTS ---
+	// #{!ex variable}
+	public static final byte CONDITION_TAG_NOT_EXISTS = 4;
 
-	/**
-	 * Array of sub-fragments.
-	 */
-	public Fragment[] children;
+	// #{eq variable}
+	public static final byte CONDITION_TAG_VALUE_EQUALS = 5;
+
+	// #{!eq variable}
+	public static final byte CONDITION_TAG_VALUE_NOT_EQUALS = 6;
+
+	// #{for variable}
+	public static final byte FOR_CYCLE = 7;
+
+	// #{in path}
+	public static final byte INSERTABLE_TEMPLATE_FILE = 8;
 	
 }

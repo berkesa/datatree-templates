@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/berkesa/datatree-templates.svg?branch=master)](https://travis-ci.org/berkesa/datatree-templates)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/ce3625975fd940829e3f9cfb163b7a9f)](https://www.codacy.com/app/berkesa/datatree-templates?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=berkesa/datatree-templates&amp;utm_campaign=Badge_Grade)
 [![codecov](https://codecov.io/gh/berkesa/datatree-templates/branch/master/graph/badge.svg)](https://codecov.io/gh/berkesa/datatree-templates)
 [![GitHub license](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/berkesa/datatree/master/LICENSE)
 

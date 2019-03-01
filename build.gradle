@@ -83,6 +83,33 @@ dependencies {
 	// https://mvnrepository.com/artifact/com.yahoo.platform.yui/yuicompressor
 	compile group: 'com.yahoo.platform.yui', name: 'yuicompressor', version: '2.4.8'
 	
+	// =========== TEMPLATE ENGINES FOR TESTING ===============
+	
+	// --- FREEMARKER ---
+	
+	// https://mvnrepository.com/artifact/org.freemarker/freemarker
+	compile group: 'org.freemarker', name: 'freemarker', version: '2.3.28'
+	
+	// --- JADE ---
+	
+	// https://mvnrepository.com/artifact/de.neuland-bfi/jade4j
+	compile group: 'de.neuland-bfi', name: 'jade4j', version: '1.2.7'
+
+	// --- MUSTACHE ---
+		
+	// https://mvnrepository.com/artifact/com.github.spullara.mustache.java/compiler
+	compile group: 'com.github.spullara.mustache.java', name: 'compiler', version: '0.9.6'
+
+	// --- THYMELEAF ---
+	
+	// https://mvnrepository.com/artifact/org.thymeleaf/thymeleaf
+	compile group: 'org.thymeleaf', name: 'thymeleaf', version: '3.0.11.RELEASE'
+
+	// --- PEBBLE ---
+	
+	// https://mvnrepository.com/artifact/com.mitchellbosecke/pebble
+	compile group: 'com.mitchellbosecke', name: 'pebble', version: '2.4.0'
+	
 }
 
 sourceCompatibility = 1.8

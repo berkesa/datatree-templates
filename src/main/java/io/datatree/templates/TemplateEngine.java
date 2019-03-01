@@ -44,7 +44,7 @@ import io.datatree.dom.Cache;
  * <br>
  * #{include ../parts/header.html}<br>
  * <br>
- * Shorter syntax with "inc":<br>
+ * Shorter syntax with "in":<br>
  * <br>
  * #{in footer.txt}<br>
  * <br>
@@ -656,6 +656,14 @@ public class TemplateEngine implements FragmentTypes {
 
 	public void setTemplatePreProcessor(Function<String, String> templatePreProcessor) {
 		this.templatePreProcessor = templatePreProcessor;
+	}
+
+	public int getWriteBufferSize() {
+		return writeBufferSize;
+	}
+
+	public void setWriteBufferSize(int writeBufferSize) {
+		this.writeBufferSize = writeBufferSize;
 	}
 
 }

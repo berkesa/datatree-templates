@@ -7,9 +7,6 @@
 Small and fast template engine capable of producing html, xml, and plain text files.
 The template engine works with hierarchical collection structures (cannot be used with POJO classes).
 Its operating logic is very simple - similar to the Mustache Engine - which makes it pretty fast.
-This template engine stores the static parts of the templates in binary form (eg. in UTF8-array).
-So if you create a byte-array directly from a template, it is faster than most of the String-based template engines
-(this is because it spends less time with character encoding).
 
 ## Download
 
@@ -45,8 +42,8 @@ engine.define("page.html", "Hello #{name} !");
 Tree data = new Tree();
 data.put("name", "Tom");
 
-// The "out" contains "Hello Tom !"
-String out = engine.processToString("page.html", data);
+// The "out" contains "Hello Tom !" in UTF-8
+byte[] out = engine.process("page.html", data);
 ```
 
 ### Working from a directory

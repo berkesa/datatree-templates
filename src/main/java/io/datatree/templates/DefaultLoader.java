@@ -35,7 +35,7 @@ public class DefaultLoader implements ResourceLoader {
 		if (file.isFile()) {
 			return readFully(new FileInputStream(file), charset);
 		}
-		URL url = DefaultLoader.class.getResource(templatePath);
+		URL url = getClass().getResource(templatePath);
 		if (url == null) {
 			throw new IOException("Template not found: " + templatePath);
 		}
@@ -72,7 +72,7 @@ public class DefaultLoader implements ResourceLoader {
 			if (file.isFile()) {
 				return file.lastModified();
 			}
-			URL url = DefaultLoader.class.getResource(templatePath);
+			URL url = getClass().getResource(templatePath);
 			String path = url.getFile();
 			if (path == null || path.isEmpty()) {
 				return -1;

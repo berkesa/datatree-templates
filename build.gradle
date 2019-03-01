@@ -40,6 +40,17 @@ configurations.all {
     // resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
+sourceSets {
+	main {
+		java {
+			srcDirs= ["src/main/java"]
+		}
+		resources {
+			srcDirs= ["src/test/java"]
+		}
+	}
+}
+
 // --- REPOSITORIES ---
 
 repositories {

@@ -188,10 +188,10 @@ public class TemplateEngine implements FragmentTypes {
 	 * 
 	 * @return rendered template in a byte array
 	 * 
-	 * @throws Exception
+	 * @throws IOException
 	 *             any I/O or syntax exteption
 	 */
-	public byte[] process(String templatePath, Map<String, Object> data) throws Exception {
+	public byte[] process(String templatePath, Map<String, Object> data) throws IOException {
 		return process(templatePath, new Tree(data));
 	}
 
@@ -207,7 +207,7 @@ public class TemplateEngine implements FragmentTypes {
 	 * 
 	 * @return rendered template in a byte array
 	 * 
-	 * @throws Exception
+	 * @throws IOException
 	 *             any I/O or syntax exteption
 	 */
 	public byte[] process(String templatePath, Tree data) throws IOException {
@@ -229,10 +229,10 @@ public class TemplateEngine implements FragmentTypes {
 	 * 
 	 * @return rendered template as String
 	 * 
-	 * @throws Exception
+	 * @throws IOException
 	 *             any I/O or syntax exteption
 	 */
-	public String processToString(String templatePath, Map<String, Object> data) throws Exception {
+	public String processToString(String templatePath, Map<String, Object> data) throws IOException {
 		return processToString(templatePath, new Tree(data));
 	}
 
@@ -248,10 +248,10 @@ public class TemplateEngine implements FragmentTypes {
 	 * 
 	 * @return rendered template as String
 	 * 
-	 * @throws Exception
+	 * @throws IOException
 	 *             any I/O or syntax exteption
 	 */
-	public String processToString(String templatePath, Tree data) throws Exception {
+	public String processToString(String templatePath, Tree data) throws IOException {
 		StringBuilder builder = new StringBuilder(writeBufferSize);
 		String path = getAbsolutePath(templatePath);
 		transform(path, builder, getTemplate(path), data, null);
@@ -268,11 +268,8 @@ public class TemplateEngine implements FragmentTypes {
 	 *            "admin/login.html")
 	 * @param templateSource
 	 *            source (~= HTML source and tags)
-	 * 
-	 * @throws Exception
-	 *             any I/O or syntax exteption
 	 */
-	public void define(String templatePath, String templateSource) throws Exception {
+	public void define(String templatePath, String templateSource) {
 		Fragment template = FragmentBuilder.compile(templateSource, templatePath, -1, charset);
 		cache.put(templatePath, template);
 	}
@@ -285,6 +282,20 @@ public class TemplateEngine implements FragmentTypes {
 	 */
 	public void remove(String templatePath) {
 		cache.remove(templatePath);
+	}
+
+	/**
+	 * Returns true if the memory cache contains a mapping for the specified
+	 * template.
+	 * 
+	 * @param templatePath
+	 *            path of template
+	 * 
+	 * @return Returns true if the cache contains a mapping for the specified
+	 *         template.
+	 */
+	public boolean contains(String templatePath) {
+		return cache.get(templatePath) != null;
 	}
 
 	/**

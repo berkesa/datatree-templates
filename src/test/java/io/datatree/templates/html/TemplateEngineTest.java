@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.datatree.templates;
+package io.datatree.templates.html;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -24,6 +24,8 @@ import java.util.UUID;
 import org.junit.Test;
 
 import io.datatree.Tree;
+import io.datatree.templates.SimpleHtmlMinifier;
+import io.datatree.templates.TemplateEngine;
 import junit.framework.TestCase;
 
 /**
@@ -40,7 +42,7 @@ public class TemplateEngineTest extends TestCase {
 		engine.setRootDirectory("");
 		engine.define("page.html", ">>>#{variable}<<<");
 		
-		assertNotNull(engine.cache.get("page.html"));
+		assertTrue(engine.contains("page.html"));
 		
 		Tree data = new Tree();
 		data.put("variable", 123);
@@ -49,7 +51,7 @@ public class TemplateEngineTest extends TestCase {
 		assertEquals(html, ">>>123<<<");
 		
 		engine.remove("page.html");
-		assertNull(engine.cache.get("page.html"));
+		assertFalse(engine.contains("page.html"));
 		try {
 			html = process("page.html", data);
 			fail();
@@ -61,9 +63,9 @@ public class TemplateEngineTest extends TestCase {
 		html = process("page.html", data);
 		assertEquals(html, ">>>a<<<");
 		
-		assertNotNull(engine.cache.get("page.html"));
+		assertTrue(engine.contains("page.html"));
 		engine.clear();
-		assertNull(engine.cache.get("page.html"));
+		assertFalse(engine.contains("page.html"));
 	}
 	
 	@Test

@@ -17,7 +17,9 @@ buildscript {
 // --- JAVADOC ---
 
 javadoc {
+	options.encoding = 'UTF-8'
 	failOnError = true
+	exclude "**/html/**"
 }
 
 // --- JACOCO ---
@@ -62,6 +64,9 @@ repositories {
 // --- DEPENDENCIES ---
 
 dependencies {
+
+    // ================== COMPILATION =========================
+    
     testCompile 'junit:junit:4.12'
 	ecj 'org.eclipse.jdt.core.compiler:ecj:4.4.2'
 
@@ -93,7 +98,7 @@ modifyPom {
         name 'DataTree Templates'
         description 'Template Engine based on DataTree API.'
         url 'https://berkesa.github.io/datatree-templates/'
-        inceptionYear '2017'
+        inceptionYear '2019'
 
         scm {
             url 'https://berkesa.github.io/datatree-templates/'
@@ -134,3 +139,12 @@ nexus {
 	snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots'
 }
 
+// --- COMPILATION ---
+
+compileJava {
+	options.fork = true
+	options.forkOptions.with {
+		executable = 'java'
+		jvmArgs = ['-classpath', project.configurations.ecj.asPath, 'org.eclipse.jdt.internal.compiler.batch.Main', '-nowarn']
+	}
+}

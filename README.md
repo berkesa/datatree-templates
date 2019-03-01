@@ -45,8 +45,8 @@ engine.define("page.html", "Hello #{name} !");
 Tree data = new Tree();
 data.put("name", "Tom");
 
-// The "out" contains "Hello Tom !" in UTF-8
-byte[] out = engine.process("page.html", data);
+// The "out" contains "Hello Tom !"
+String out = engine.processToString("page.html", data);
 ```
 
 ### Working from a directory
@@ -61,17 +61,22 @@ engine.setCharset(StandardCharsets.UTF_8);
 Map<String, Object> data = new HashMap<>();
 data.put("key", "value");
 
+// The "out" contains the "index.html" in UTF-8
 byte[] out = engine.process("index.html", data);
 ```
 
 ### Using custom loader
 
+The default template-loader loads from classpath and file system. You can create your own template-loader by implementing the "io.datatree.templates.ResourceLoader" interface.
+
 ```java
 TemplateEngine engine = new TemplateEngine();
-engine.setLoader(new YourResourceLoader());
+engine.setLoader(new CustomResourceLoader());
 ```
 
 ### Using custom preprocessor
+
+Template Preprocessor runs after the loader loads a template. If the cache is enabled (~= engine.setReloadable(false)), it will only run once per template. For example, this feature can be used to minimize HTML-pages.
 
 ```java
 TemplateEngine engine = new TemplateEngine();
@@ -86,7 +91,7 @@ Sub-template insertion:
 #{include ../parts/header.html}
 ```
 
-Shorter syntax with "inc":
+Shorter syntax with "in":
 
 ```html
 #{in parts/footer.txt}
@@ -95,7 +100,9 @@ Shorter syntax with "inc":
 Simple variable insertion:
 
 ```html
-Name of client: #{name}
+<p> Name: #{name} </p>
+<p> Age:  #{age} </p>
+<p> Can be used for JSON-path syntax:  #{users[0].address.zipcode} </p>
 ```
 
 For a cycle of elements of a JSON array:
@@ -110,7 +117,11 @@ The use of a colon is optional:
 
 ```html
 #{for item list}
-	#{item.email}
+	<tr>
+		<td> #{item.id} </td>
+		<td> #{item.name} </td>
+		<td> #{item.description} </td>
+	</tr>
 #{end}
 ```
 
@@ -128,6 +139,7 @@ Paste if there is a JSON parameter:
 
 ```html
 #{exists email}
+	<!-- appears if the "email" parameter exists -->
 	Send mail to: {#email}
 #{end}
 ```
@@ -144,6 +156,7 @@ Paste if NO value exists:
 
 ```html
 #{!exists email}
+	<!-- appears only when the parameter is missing -->
 	No email address provided!
 #{end}
 ```
@@ -160,6 +173,7 @@ Paste if the value of the parameter is the same:
 
 ```html
 #{equals email admin@foo.com}
+	<!-- appears when the "email" parameter is "email admin@foo.com" -->
 	An administrator email address is provided.
 #{end}
 ```
@@ -176,6 +190,7 @@ Paste if NOT the same value as the given value:
 
 ```html
 #{!equals email admin@foo.com}
+	<!-- appears when the "email" parameter is NOT "email admin@foo.com" -->
 	The administrator email address is not specified.
 #{end}
 ```

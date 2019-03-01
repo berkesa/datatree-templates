@@ -20,7 +20,6 @@ package io.datatree.templates;
 import java.io.File;
 import java.io.StringWriter;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Map;
 
@@ -34,6 +33,7 @@ import com.mitchellbosecke.pebble.loader.FileLoader;
 import de.neuland.jade4j.Jade4J.Mode;
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.model.JadeModel;
+import de.neuland.jade4j.template.FileTemplateLoader;
 import freemarker.template.Configuration;
 import io.datatree.Tree;
 
@@ -55,17 +55,17 @@ public class PerformanceTest {
 			}
 		}
 		Map<String, Object> map = (Map<String, Object>) data.asObject();
-		long max = 50000;
+		long max = 100000;
 		System.out.println("Generating " + max + " pages (per engines), please wait...");
 		
 		// DataTree
 		io.datatree.templates.TemplateEngine e1 = new io.datatree.templates.TemplateEngine();
 		e1.setRootDirectory("/io/datatree/templates/html");
-		byte[] rsp = null;
+		String rsp = null;
 		for (int i = 0; i < 10; i++) {
 			rsp = dataTreeGen(map, e1);
 		}
-		// System.out.println("DataTree Templates:\r\n"  + new String(rsp, StandardCharsets.UTF_8));
+		// System.out.println("DataTree Templates:\r\n"  + rsp);
 		long start = System.currentTimeMillis();
 		for (int i = 0; i < max; i++) {
 			rsp = dataTreeGen(map, e1);
@@ -81,7 +81,7 @@ public class PerformanceTest {
 		for (int i = 0; i < 10; i++) {
 			rsp = freeMarkerGen(map, e2);
 		}
-		// System.out.println("FreeMarker:\r\n"  + new String(rsp, StandardCharsets.UTF_8));
+		// System.out.println("FreeMarker:\r\n"  + rsp);
 		start = System.currentTimeMillis();
 		for (int i = 0; i < max; i++) {
 			rsp = freeMarkerGen(map, e2);
@@ -97,10 +97,11 @@ public class PerformanceTest {
 		e3.setMode(Mode.HTML);
 		String dir = new File(url.getFile()).getParent();
 		String name = dir + "/test.jade";
+		e3.setTemplateLoader(new CachingJadeLoader("", "UTF-8"));
 		for (int i = 0; i < 10; i++) {
 			rsp = jadeGen(name, map, e3);
 		}
-		// System.out.println("Jade:\r\n"  + new String(rsp, StandardCharsets.UTF_8));
+		// System.out.println("Jade:\r\n"  + rsp);
 		start = System.currentTimeMillis();
 		for (int i = 0; i < max; i++) {
 			rsp = jadeGen(name, map, e3);
@@ -114,7 +115,7 @@ public class PerformanceTest {
 		for (int i = 0; i < 10; i++) {
 			rsp = mustacheGen(name, map, e4);
 		}
-		// System.out.println("Mustache:\r\n"  + new String(rsp, StandardCharsets.UTF_8));
+		// System.out.println("Mustache:\r\n"  + rsp);
 		start = System.currentTimeMillis();
 		for (int i = 0; i < max; i++) {
 			rsp = mustacheGen(name, map, e4);
@@ -129,7 +130,7 @@ public class PerformanceTest {
 		for (int i = 0; i < 10; i++) {
 			rsp = pebbleGen(map, e5);
 		}
-		//System.out.println("Pebble:\r\n"  + new String(rsp, StandardCharsets.UTF_8));
+		//System.out.println("Pebble:\r\n"  + rsp);
 		start = System.currentTimeMillis();
 		for (int i = 0; i < max; i++) {
 			rsp = pebbleGen(map, e5);
@@ -147,7 +148,7 @@ public class PerformanceTest {
 		for (int i = 0; i < 10; i++) {
 			rsp = thymeleafGen(map, e6);
 		}
-		// System.out.println("Thymeleaf:\r\n"  + new String(rsp, StandardCharsets.UTF_8));
+		System.out.println("Thymeleaf:\r\n"  + rsp);
 		start = System.currentTimeMillis();
 		for (int i = 0; i < max; i++) {
 			rsp = thymeleafGen(map, e6);
@@ -156,37 +157,51 @@ public class PerformanceTest {
 		System.out.println("Thymeleaf: " + duration + " msec");
 	}
 
-	private static final byte[] thymeleafGen(Map<String, Object> map, org.thymeleaf.TemplateEngine e6) throws Exception {
+	private static final class CachingJadeLoader extends FileTemplateLoader {
+
+		public CachingJadeLoader(String folderPath, String encoding) {
+			super(folderPath, encoding);
+		}
+
+		@Override
+		public long getLastModified(String name) {
+			return 1;
+		}
+		
+	}
+	
+	private static final String thymeleafGen(Map<String, Object> map, org.thymeleaf.TemplateEngine e6) throws Exception {
 		StringWriter out = new StringWriter(2048);
 		e6.process("test.thymeleaf", new Context(Locale.ENGLISH, map), out);
-		return out.toString().getBytes(StandardCharsets.UTF_8);
+		return out.toString();
 	}
 
-	private static final byte[] pebbleGen(Map<String, Object> map, com.mitchellbosecke.pebble.PebbleEngine e5) throws Exception {
+	private static final String pebbleGen(Map<String, Object> map, com.mitchellbosecke.pebble.PebbleEngine e5) throws Exception {
 		StringWriter out = new StringWriter(2048);
 		e5.getTemplate("test.pebble").evaluate(out, map);
-		return out.toString().getBytes(StandardCharsets.UTF_8);
+		return out.toString();
 	}
 	
-	private static final byte[] mustacheGen(String name, Map<String, Object> map, DefaultMustacheFactory e4) throws Exception {
+	private static final String mustacheGen(String name, Map<String, Object> map, DefaultMustacheFactory e4) throws Exception {
 		StringWriter out = new StringWriter(2048);
 		e4.compile(name).execute(out, map);
-		return out.toString().getBytes(StandardCharsets.UTF_8);
+		return out.toString();
 	}
 	
-	private static final byte[] dataTreeGen(Map<String, Object> map, io.datatree.templates.TemplateEngine e1) throws Exception {
-		return e1.processToString("test.datatree", map).getBytes(StandardCharsets.UTF_8);
+	private static final String dataTreeGen(Map<String, Object> map, io.datatree.templates.TemplateEngine e1) throws Exception {
+		return e1.process("test.datatree", map);
 	}
 	
-	private static final byte[] freeMarkerGen(Map<String, Object> map, freemarker.template.Configuration e2) throws Exception {
+	private static final String freeMarkerGen(Map<String, Object> map, freemarker.template.Configuration e2) throws Exception {
 		StringWriter out = new StringWriter(2048);
 		e2.getTemplate("test.freemarker").process(map, out);
-		return out.toString().getBytes(StandardCharsets.UTF_8);
+		return out.toString();
 	}
 	
-	private static final byte[] jadeGen(String name, Map<String, Object> map, JadeConfiguration e3) throws Exception {
+	private static final String jadeGen(String name, Map<String, Object> map, JadeConfiguration e3) throws Exception {
 		StringWriter out = new StringWriter(2048);
 		e3.getTemplate(name).process(new JadeModel(map), out);
-		return out.toString().getBytes(StandardCharsets.UTF_8);
+		return out.toString();
 	}
+	
 }

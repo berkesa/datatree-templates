@@ -17,7 +17,6 @@
  */
 package io.datatree.templates;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -178,7 +177,7 @@ public class TemplateEngine implements FragmentTypes {
 
 	/**
 	 * Executes template, using the Map-based data model provided, then
-	 * returning the result in a byte-array.
+	 * returning the result as String.
 	 * 
 	 * @param templatePath
 	 *            relative path to template with extension (eg. "index.html" or
@@ -186,58 +185,17 @@ public class TemplateEngine implements FragmentTypes {
 	 * @param data
 	 *            data model as Map
 	 * 
-	 * @return rendered template in a byte array
+	 * @return rendered template as String
 	 * 
 	 * @throws IOException
 	 *             any I/O or syntax exteption
 	 */
-	public byte[] process(String templatePath, Map<String, Object> data) throws IOException {
+	public String process(String templatePath, Map<String, Object> data) throws IOException {
 		return process(templatePath, new Tree(data));
 	}
 
 	/**
 	 * Executes template, using the Tree-based data model provided, then
-	 * returning the result in a byte-array.
-	 * 
-	 * @param templatePath
-	 *            relative path to template with extension (eg. "index.html" or
-	 *            "admin/login.html")
-	 * @param data
-	 *            data model as Tree
-	 * 
-	 * @return rendered template in a byte array
-	 * 
-	 * @throws IOException
-	 *             any I/O or syntax exteption
-	 */
-	public byte[] process(String templatePath, Tree data) throws IOException {
-		ByteArrayOutputStream stream = new ByteArrayOutputStream(writeBufferSize);
-		String path = getAbsolutePath(templatePath);
-		transform(path, stream, getTemplate(path), data, null);
-		return stream.toByteArray();
-	}
-
-	/**
-	 * Executes template, using the Map-based data model provided, then
-	 * returning the result as String.
-	 * 
-	 * @param templatePath
-	 *            relative path to template with extension (eg. "index.html" or
-	 *            "admin/login.html")
-	 * @param data
-	 *            data model as Map
-	 * 
-	 * @return rendered template as String
-	 * 
-	 * @throws IOException
-	 *             any I/O or syntax exteption
-	 */
-	public String processToString(String templatePath, Map<String, Object> data) throws IOException {
-		return processToString(templatePath, new Tree(data));
-	}
-
-	/**
-	 * Executes template, using the Tree-based data model provided, then
 	 * returning the result as String.
 	 * 
 	 * @param templatePath
@@ -251,7 +209,7 @@ public class TemplateEngine implements FragmentTypes {
 	 * @throws IOException
 	 *             any I/O or syntax exteption
 	 */
-	public String processToString(String templatePath, Tree data) throws IOException {
+	public String process(String templatePath, Tree data) throws IOException {
 		StringBuilder builder = new StringBuilder(writeBufferSize);
 		String path = getAbsolutePath(templatePath);
 		transform(path, builder, getTemplate(path), data, null);
@@ -270,7 +228,7 @@ public class TemplateEngine implements FragmentTypes {
 	 *            source (~= HTML source and tags)
 	 */
 	public void define(String templatePath, String templateSource) {
-		Fragment template = FragmentBuilder.compile(templateSource, templatePath, -1, charset);
+		Fragment template = FragmentBuilder.compile(templateSource, templatePath, 1);
 		cache.put(templatePath, template);
 	}
 
@@ -321,7 +279,7 @@ public class TemplateEngine implements FragmentTypes {
 				source = templatePreProcessor.apply(source);
 			}
 			long lastModified = loader.lastModified(templatePath);
-			template = FragmentBuilder.compile(source, templatePath, lastModified, charset);
+			template = FragmentBuilder.compile(source, templatePath, lastModified);
 			cache.put(templatePath, template);
 		}
 		return template;
@@ -413,101 +371,6 @@ public class TemplateEngine implements FragmentTypes {
 		transformChildren(basePath, builder, command, root, variables);
 	}
 
-	protected void transform(String basePath, ByteArrayOutputStream stream, Fragment command, Tree root,
-			HashMap<String, Tree> variables) throws IOException {
-		String path = command.arg;
-		Tree current = root;
-		if (variables != null && path != null) {
-			for (String key : variables.keySet()) {
-				if (path.startsWith(key)) {
-					if (path.length() == key.length()) {
-						path = "";
-					} else {
-						path = path.substring(key.length() + 1);
-					}
-					current = variables.get(key);
-					break;
-				}
-			}
-		}
-		switch (command.type) {
-		case STATIC_TEXT:
-			stream.write(command.body);
-			break;
-
-		case INSERTABLE_VARIABLE:
-			String value = current.get(path, "");
-			if (value != null && !value.isEmpty()) {
-				if (escapeSpecialCharacters) {
-					writeXMLContent(stream, value);
-				} else {
-					stream.write(value.getBytes(charset));
-				}
-			}
-			break;
-
-		case FOR_CYCLE:
-			if (variables == null) {
-				variables = new HashMap<String, Tree>();
-			}
-			Tree parent = current.get(path);
-			if (parent != null) {
-				for (Tree child : parent) {
-					variables.put(command.content, child);
-					transformChildren(basePath, stream, command, root, variables);
-				}
-			}
-			variables = null;
-			return;
-
-		case CONDITION_TAG_EXISTS:
-			if (current.get(path) == null) {
-				return;
-			}
-			break;
-
-		case CONDITION_TAG_NOT_EXISTS:
-			if (current.get(path) == null) {
-				break;
-			}
-			return;
-
-		case CONDITION_TAG_VALUE_EQUALS:
-			value = current.get(path, "");
-			if (value.equals(command.content)) {
-				break;
-			}
-			return;
-
-		case CONDITION_TAG_VALUE_NOT_EQUALS:
-			value = current.get(path, "");
-			if (value.equals(command.content)) {
-				return;
-			}
-			break;
-
-		case INSERTABLE_TEMPLATE_FILE:
-			String subTemplatePath = getAbsolutePath(basePath, command.arg);
-			Fragment include = getTemplate(subTemplatePath);
-			if (include == null) {
-				return;
-			}
-			transform(subTemplatePath, stream, include, root, variables);
-		default:
-			break;
-		}
-		transformChildren(basePath, stream, command, root, variables);
-	}
-
-	protected void transformChildren(String basePath, ByteArrayOutputStream stream, Fragment command, Tree root,
-			HashMap<String, Tree> variables) throws IOException {
-		if (command.children != null) {
-			for (Fragment child : command.children) {
-				transform(basePath, stream, child, root, variables);
-			}
-		}
-	}
-
 	protected void transformChildren(String basePath, StringBuilder builder, Fragment command, Tree root,
 			HashMap<String, Tree> variables) throws IOException {
 		if (command.children != null) {
@@ -517,17 +380,13 @@ public class TemplateEngine implements FragmentTypes {
 		}
 	}
 
-	protected void writeXMLContent(ByteArrayOutputStream out, String fromString) throws IOException {
-		if (fromString == null || fromString.isEmpty()) {
+	protected void writeXMLContent(StringBuilder builder, String str) {
+		if (str.indexOf('<') == -1 && str.indexOf('>') == -1 && str.indexOf('&') == -1 && str.indexOf('"') == -1
+				&& str.indexOf('\'') == -1) {
+			builder.append(str);
 			return;
 		}
-		StringBuilder builder = new StringBuilder(fromString.length() * 2);
-		writeXMLContent(builder, fromString);
-		out.write(builder.toString().getBytes(charset));
-	}
-
-	protected void writeXMLContent(StringBuilder builder, String fromString) {
-		char[] chars = fromString.trim().toCharArray();
+		char[] chars = str.trim().toCharArray();
 		if (chars.length != 0) {
 			char c;
 			for (int n = 0; n < chars.length; n++) {

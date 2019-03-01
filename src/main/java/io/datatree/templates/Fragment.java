@@ -39,11 +39,6 @@ public class Fragment {
 	 */
 	public String content;
 
-	/**
-	 * Encoded content (eg. in UTF-8 format).
-	 */
-	public byte[] body;
-	
 	// --- SUB-FRAGMENTS ---
 
 	/**

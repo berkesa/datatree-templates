@@ -199,18 +199,10 @@ public class TemplateEngineTest extends TestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected String process(String templatePath, Tree data) throws Exception {
-		byte[] bytes1 = engine.process(templatePath, data);
-		byte[] bytes2 = engine.process(templatePath, (Map<String, Object>) data.asObject());		
-		String html1 = new String(bytes1, StandardCharsets.UTF_8);
-		String html2 = new String(bytes2, StandardCharsets.UTF_8);		
-		assertEquals(html1, html2);
-		
-		String html3 = engine.processToString(templatePath, data);	
-		String html4 = engine.processToString(templatePath, (Map<String, Object>) data.asObject());
-		assertEquals(html2, html3);
-		assertEquals(html3, html4);
-		
+	protected String process(String templatePath, Tree data) throws Exception {	
+		String html1 = engine.process(templatePath, data);	
+		String html2 = engine.process(templatePath, (Map<String, Object>) data.asObject());
+		assertEquals(html1, html2);		
 		return html1;
 	}
 

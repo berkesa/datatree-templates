@@ -51,10 +51,10 @@ public class Sample {
 		engine.setTemplatePreProcessor(new SimpleHtmlMinifier());
 		
 		// Invoke Engine
-		byte[] bytes = engine.process("template.html", data);
+		String result = engine.process("template.html", data);
 
 		// Display result
-		System.out.println(new String(bytes, "UTF8"));
+		System.out.println(result);
 
 	}
 	

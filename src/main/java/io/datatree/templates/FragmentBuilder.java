@@ -17,7 +17,6 @@
  */
 package io.datatree.templates;
 
-import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.StringTokenizer;
 
@@ -26,15 +25,15 @@ import java.util.StringTokenizer;
  */
 public final class FragmentBuilder implements FragmentTypes {
 
-	public static final Fragment compile(String template, String templatePath, long lastModified, Charset charset) {
+	public static final Fragment compile(String template, String templatePath, long lastModified) {
 		Fragment root = new Fragment();
-		compile(template, root, charset);
+		compile(template, root);
 		root.arg = templatePath;
 		root.content = Long.toString(lastModified);
 		return root;
 	}
 
-	private static final int compile(String template, Fragment command, Charset charset) {
+	private static final int compile(String template, Fragment command) {
 		int start = 0;
 		int end = template.indexOf("#{");
 		LinkedList<Fragment> treeCommands = new LinkedList<>();
@@ -46,7 +45,6 @@ public final class FragmentBuilder implements FragmentTypes {
 			if (start != end) {
 				subPrint.type = STATIC_TEXT;
 				subPrint.content = template.substring(start, end);
-				subPrint.body = subPrint.content.getBytes(charset);
 				treeCommands.add(subPrint);
 			}
 			if (end == template.length()) {
@@ -79,7 +77,7 @@ public final class FragmentBuilder implements FragmentTypes {
 					if (commandType.startsWith("ex")) {
 						subCommand.type = CONDITION_TAG_EXISTS;
 						subCommand.arg = st.nextToken();
-						start += compile(subTemplate, subCommand, charset);
+						start += compile(subTemplate, subCommand);
 						break;
 					}
 
@@ -88,7 +86,7 @@ public final class FragmentBuilder implements FragmentTypes {
 					if (commandType.startsWith("!ex")) {
 						subCommand.type = CONDITION_TAG_NOT_EXISTS;
 						subCommand.arg = st.nextToken();
-						start += compile(subTemplate, subCommand, charset);
+						start += compile(subTemplate, subCommand);
 						break;
 					}
 
@@ -99,7 +97,7 @@ public final class FragmentBuilder implements FragmentTypes {
 						subCommand.type = CONDITION_TAG_VALUE_EQUALS;
 						subCommand.arg = st.nextToken();
 						subCommand.content = st.nextToken();
-						start += compile(subTemplate, subCommand, charset);
+						start += compile(subTemplate, subCommand);
 						break;
 					}
 
@@ -110,7 +108,7 @@ public final class FragmentBuilder implements FragmentTypes {
 						subCommand.type = CONDITION_TAG_VALUE_NOT_EQUALS;
 						subCommand.arg = st.nextToken();
 						subCommand.content = st.nextToken();
-						start += compile(subTemplate, subCommand, charset);
+						start += compile(subTemplate, subCommand);
 						break;
 					}
 
@@ -127,7 +125,7 @@ public final class FragmentBuilder implements FragmentTypes {
 							// Colon is optional
 							subCommand.arg = st.nextToken();
 						}
-						start += compile(subTemplate, subCommand, charset);
+						start += compile(subTemplate, subCommand);
 						break;
 					}
 

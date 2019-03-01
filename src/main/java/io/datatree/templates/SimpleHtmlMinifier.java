@@ -21,7 +21,9 @@ import java.util.function.Function;
 
 /**
  * Simple (but fast) HTML minifier. For complex web sites, use a professional
- * HTML-minifier. (eg. the {@link GoogleHtmlMinifier}). Usage:
+ * HTML-minifier. (eg. the {@link GoogleHtmlMinifier}). Minimization is run only
+ * once (per page), after loading. Usage:
+ * 
  * <pre>
  * TemplateEngine engine = new TemplateEngine();
  * engine.setRootDirectory("/www");

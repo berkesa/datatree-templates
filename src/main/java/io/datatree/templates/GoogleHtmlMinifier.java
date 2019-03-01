@@ -22,7 +22,8 @@ import java.util.function.Function;
 import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
 
 /**
- * HTML minifier based on the Google's HtmlCompressor API. Usage:
+ * HTML minifier based on the Google's HtmlCompressor API. Minimization is run
+ * only once (per page), after loading. Usage:
  * 
  * <pre>
  * TemplateEngine engine = new TemplateEngine();

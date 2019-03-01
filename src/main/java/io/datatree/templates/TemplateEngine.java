@@ -258,6 +258,42 @@ public class TemplateEngine implements FragmentTypes {
 		return builder.toString();
 	}
 
+	// --- DEFINE TEMPLATE BY SOURCE ---
+
+	/**
+	 * Adds a template based on its (HTML/TEXT/XML) source.
+	 * 
+	 * @param templatePath
+	 *            "virtual" path of template (eg. "index.html" or
+	 *            "admin/login.html")
+	 * @param templateSource
+	 *            source (~= HTML source and tags)
+	 * 
+	 * @throws Exception
+	 *             any I/O or syntax exteption
+	 */
+	public void define(String templatePath, String templateSource) throws Exception {
+		Fragment template = FragmentBuilder.compile(templateSource, templatePath, -1, charset);
+		cache.put(templatePath, template);
+	}
+
+	/**
+	 * Removes a template from the memory cache.
+	 * 
+	 * @param templatePath
+	 *            path of template
+	 */
+	public void remove(String templatePath) {
+		cache.remove(templatePath);
+	}
+
+	/**
+	 * Removes all templates from the memory.
+	 */
+	public void clear() {
+		cache.clear();
+	}
+
 	// --- PROTECTED METHODS ---
 
 	protected Fragment getTemplate(String templatePath) throws IOException {
@@ -317,9 +353,12 @@ public class TemplateEngine implements FragmentTypes {
 			if (variables == null) {
 				variables = new HashMap<String, Tree>();
 			}
-			for (Tree child : current.get(path)) {
-				variables.put(command.content, child);
-				transformChildren(basePath, builder, command, root, variables);
+			Tree parent = current.get(path);
+			if (parent != null) {
+				for (Tree child : parent) {
+					variables.put(command.content, child);
+					transformChildren(basePath, builder, command, root, variables);
+				}
 			}
 			variables = null;
 			return;
@@ -400,9 +439,12 @@ public class TemplateEngine implements FragmentTypes {
 			if (variables == null) {
 				variables = new HashMap<String, Tree>();
 			}
-			for (Tree child : current.get(path)) {
-				variables.put(command.content, child);
-				transformChildren(basePath, stream, command, root, variables);
+			Tree parent = current.get(path);
+			if (parent != null) {
+				for (Tree child : parent) {
+					variables.put(command.content, child);
+					transformChildren(basePath, stream, command, root, variables);
+				}
 			}
 			variables = null;
 			return;

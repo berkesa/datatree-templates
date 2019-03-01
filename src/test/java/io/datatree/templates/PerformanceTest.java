@@ -24,7 +24,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Map;
 
-import org.thymeleaf.cache.StandardCacheManager;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
 

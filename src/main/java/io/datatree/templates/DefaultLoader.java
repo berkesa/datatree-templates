@@ -46,7 +46,8 @@ public class DefaultLoader implements ResourceLoader {
 		byte[] data = new byte[0];
 		try {
 			byte[] packet = new byte[4096];
-			int i, l;
+			int i;
+			int l;
 			while ((i = in.read(packet)) != -1) {
 				l = data.length + i;
 				byte[] s = new byte[l];

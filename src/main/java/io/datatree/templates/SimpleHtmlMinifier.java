@@ -47,7 +47,7 @@ public class SimpleHtmlMinifier implements Function<String, String> {
 			c = in[i];
 			if (inScript) {
 				out[len++] = c;
-				if (c == '<' && i < in.length - 7 && text.substring(i, i + 7).toLowerCase().equals("</scrip")) {
+				if (c == '<' && i < in.length - 7 && text.substring(i, i + 7).equalsIgnoreCase("</scrip")) {
 					inScript = false;
 				}
 			} else if (Character.isWhitespace(c)) {
@@ -56,7 +56,7 @@ public class SimpleHtmlMinifier implements Function<String, String> {
 				}
 				wasWhitespace = true;
 				out[len++] = ' ';
-			} else if (c == '<' && i < in.length - 7 && text.substring(i, i + 7).toLowerCase().equals("<script")) {
+			} else if (c == '<' && i < in.length - 7 && text.substring(i, i + 7).equalsIgnoreCase("<script")) {
 				inScript = true;
 				out[len++] = c;
 			} else if ((c == '<' || c == '#') && len > 2 && (out[len - 2] == '>' || out[len - 2] == '}')

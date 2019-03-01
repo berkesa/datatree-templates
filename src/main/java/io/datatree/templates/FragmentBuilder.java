@@ -62,86 +62,79 @@ public final class FragmentBuilder implements FragmentTypes {
 				String commandType = st.nextToken().toLowerCase();
 				String subTemplate = template.substring(start);
 				boolean endTag = false;
-				for (;;) {
+				if (commandType.startsWith("in")) {
 
 					// #{in path} or #{include path}
 					// File insertion (can be relative path)
-					if (commandType.startsWith("in")) {
-						subCommand.type = INSERTABLE_TEMPLATE_FILE;
-						subCommand.arg = st.nextToken().replace('\\', '/');
-						break;
-					}
+					subCommand.type = INSERTABLE_TEMPLATE_FILE;
+					subCommand.arg = st.nextToken().replace('\\', '/');
+
+				} else if (commandType.startsWith("ex")) {
 
 					// #{ex variable} or #{exists variable}...#{end}
 					// It is true that such an element exists
-					if (commandType.startsWith("ex")) {
-						subCommand.type = CONDITION_TAG_EXISTS;
-						subCommand.arg = st.nextToken();
-						start += compile(subTemplate, subCommand);
-						break;
-					}
+					subCommand.type = CONDITION_TAG_EXISTS;
+					subCommand.arg = st.nextToken();
+					start += compile(subTemplate, subCommand);
+
+				} else if (commandType.startsWith("!ex")) {
 
 					// #{!ex variable} or #{!exists variable}...#{end}
 					// It is true that such an element does not exist
-					if (commandType.startsWith("!ex")) {
-						subCommand.type = CONDITION_TAG_NOT_EXISTS;
-						subCommand.arg = st.nextToken();
-						start += compile(subTemplate, subCommand);
-						break;
-					}
+					subCommand.type = CONDITION_TAG_NOT_EXISTS;
+					subCommand.arg = st.nextToken();
+					start += compile(subTemplate, subCommand);
+
+				} else if (commandType.startsWith("eq")) {
 
 					// #{eq variable 5} or #{equals variable 5}...#{end}
 					// It is true that the value of the variable matches the
 					// third parameter
-					if (commandType.startsWith("eq")) {
-						subCommand.type = CONDITION_TAG_VALUE_EQUALS;
-						subCommand.arg = st.nextToken();
-						subCommand.content = st.nextToken();
-						start += compile(subTemplate, subCommand);
-						break;
-					}
+					subCommand.type = CONDITION_TAG_VALUE_EQUALS;
+					subCommand.arg = st.nextToken();
+					subCommand.content = st.nextToken();
+					start += compile(subTemplate, subCommand);
+
+				} else if (commandType.startsWith("!eq")) {
 
 					// #{!eq variable 5} or #{!equals variable 5}...#{end}
 					// It is true that the value of the variable does not match
 					// the parameter
-					if (commandType.startsWith("!eq")) {
-						subCommand.type = CONDITION_TAG_VALUE_NOT_EQUALS;
-						subCommand.arg = st.nextToken();
-						subCommand.content = st.nextToken();
-						start += compile(subTemplate, subCommand);
-						break;
-					}
+					subCommand.type = CONDITION_TAG_VALUE_NOT_EQUALS;
+					subCommand.arg = st.nextToken();
+					subCommand.content = st.nextToken();
+					start += compile(subTemplate, subCommand);
+
+				} else if ("for".equals(commandType)) {
 
 					// #{for variable : array}...#{end}
 					// #{for variable: array}....#{end}
 					// #{for variable array}.....#{end}
 					// For cycle on array type JSON structure
-					if (commandType.equals("for")) {
-						subCommand.type = FOR_CYCLE;
-						subCommand.content = st.nextToken().replace(':', ' ').trim();
-						subCommand.arg = st.nextToken().replace(':', ' ').trim();
-						if (st.hasMoreTokens()) {
+					subCommand.type = FOR_CYCLE;
+					subCommand.content = st.nextToken().replace(':', ' ').trim();
+					subCommand.arg = st.nextToken().replace(':', ' ').trim();
+					if (st.hasMoreTokens()) {
 
-							// Colon is optional
-							subCommand.arg = st.nextToken();
-						}
-						start += compile(subTemplate, subCommand);
-						break;
+						// Colon is optional
+						subCommand.arg = st.nextToken();
 					}
+					start += compile(subTemplate, subCommand);
+
+				} else if ("end".equals(commandType)) {
 
 					// #{end}
 					// The blocks for "for", "exists" and "equals" must be
 					// closed with "end"!
-					if (commandType.equals("end")) {
-						endTag = true;
-						break;
-					}
+					endTag = true;
+
+				} else {
 
 					// #{variable}
 					// Variable insertion
 					subCommand.type = INSERTABLE_VARIABLE;
 					subCommand.arg = commandType;
-					break;
+
 				}
 				if (endTag) {
 					break;

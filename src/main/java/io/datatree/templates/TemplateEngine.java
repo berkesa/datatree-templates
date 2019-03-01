@@ -409,6 +409,7 @@ public class TemplateEngine implements FragmentTypes {
 					break;
 				default:
 					builder.append(c);
+					break;
 				}
 			}
 		}

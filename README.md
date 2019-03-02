@@ -9,7 +9,7 @@ Small and fast template engine capable of producing html, xml, and plain text fi
 The template engine works with hierarchical collection structures (cannot be used with POJO classes).
 Its operating logic is very simple - similar to the Mustache Engine - which makes it pretty fast.
 
-![Performance](https://raw.githubusercontent.com/berkesa/datatree-templates/master/docs/chart.png)
+<p align="center">![Performance](https://raw.githubusercontent.com/berkesa/datatree-templates/master/docs/chart.png)</p>
 
 ## Capabilities
  
@@ -23,7 +23,7 @@ Its operating logic is very simple - similar to the Mustache Engine - which make
 
 ## Limitations
 
-Data must NOT contain POJO objects, only Collections (Maps, Lists, object arrays) with primitive types and Strings (or any object that can be easily converted to String). The contents of a POJO object can only be inserted into the templates with user-defined functions.
+Data must NOT contain POJO objects, only Collections (Maps, Lists, object arrays) with primitive types and Strings (or any object that can be easily converted to String). The contents of a POJO object can only be inserted into the templates with user-defined functions. No built-in multilingual support.
 
 ## Download
 
@@ -101,10 +101,10 @@ TemplateEngine engine = new TemplateEngine();
 engine.setTemplatePreProcessor(new SimpleHtmlMinifier());
 ```
 
-The following example shows how to embed Google Minfier API as a preprocessor:
+The following example shows how to embed Google's HtmlCompressor as a preprocessor:
 
 ```java
-public class GoogleHtmlMinifier extends HtmlCompressor implements Function<String, String> {
+public class GoogleMinifier extends HtmlCompressor implements Function<String, String> {
 
 	public GoogleHtmlMinifier() {
 		setCompressCss(true);
@@ -120,9 +120,9 @@ public class GoogleHtmlMinifier extends HtmlCompressor implements Function<Strin
 	}
 }
 
-// Use the minifier:
+// Use the HtmlCompressor:
 TemplateEngine engine = new TemplateEngine();
-engine.setTemplatePreProcessor(new GoogleHtmlMinifier());
+engine.setTemplatePreProcessor(new GoogleMinifier());
 ```
 
 The following two dependency is required for the example above:

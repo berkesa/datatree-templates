@@ -9,7 +9,11 @@ Small and fast template engine capable of producing html, xml, and plain text fi
 The template engine works with hierarchical collection structures (cannot be used with POJO classes).
 Its operating logic is very simple - similar to the Mustache Engine - which makes it pretty fast.
 
-![Performance](https://raw.githubusercontent.com/berkesa/datatree-templates/master/docs/chart.png)
+<p align="center">
+<a href="https://github.com/berkesa/datatree-templates/blob/master/src/test/java/io/datatree/templates/PerformanceTest.java">
+<img src="https://raw.githubusercontent.com/berkesa/datatree-templates/master/docs/chart.png">
+</a>
+</p>
 
 ## Capabilities
  

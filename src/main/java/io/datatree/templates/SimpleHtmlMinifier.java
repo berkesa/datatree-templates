@@ -20,9 +20,9 @@ package io.datatree.templates;
 import java.util.function.Function;
 
 /**
- * Simple (but fast) HTML minifier. For complex web sites, use a professional
- * HTML-minifier. (eg. the {@link GoogleHtmlMinifier}). Minimization is run only
- * once (per page), after loading. Usage:
+ * Simple HTML minifier. For complex web sites, use a professional HTML-minifier
+ * (eg. Google's HTMLCompressor). Minimization is run only once (per page),
+ * after loading the template. Usage:
  * 
  * <pre>
  * TemplateEngine engine = new TemplateEngine();

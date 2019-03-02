@@ -25,7 +25,7 @@ Small and fast template engine capable of producing html, xml, and plain text fi
 
 ## Limitations
 
-Data must **NOT** contain POJO objects, only Collections (Maps, Lists, object arrays) with primitive types and Strings (or any object that can be easily converted to String). The contents of a POJO object can only be inserted into the templates with user-defined functions. No built-in multilingual support.
+Data must **NOT** contain POJO objects, only Collections (Maps, Lists, object arrays) with primitive types and Strings (or any object that can be easily converted to String). The contents of a POJO object can only be inserted into the templates with user-defined functions. No built-in multilingual support. Syntax isn't smart; complicated logic conditions cannot be specified in the templates, only a few simpler conditions can be used.
 
 ## Download
 

@@ -25,7 +25,7 @@ Small and fast template engine capable of producing html, xml, and plain text fi
 
 ## Limitations
 
-Data must **NOT** contain POJO objects, only Collections (Maps, Lists, object arrays) with primitive types and Strings (or any object that can be easily converted to String). The contents of a POJO object can only be inserted into the templates with user-defined functions. No built-in multilingual support.
+Data must **NOT** contain POJO objects, only Collections (Maps, Lists, object arrays) with primitive types and Strings (or any object that can be easily converted to String). The contents of a POJO object can only be inserted into the templates with user-defined functions. No built-in multilingual support. Syntax isn't flexible; complicated logic conditions cannot be specified in the templates, only a few simpler condition types can be used.
 
 ## Download
 
@@ -36,7 +36,7 @@ Data must **NOT** contain POJO objects, only Collections (Maps, Lists, object ar
 	<dependency>
 		<groupId>com.github.berkesa</groupId>
 		<artifactId>datatree-templates</artifactId>
-		<version>1.0.1</version>
+		<version>1.1.1</version>
 		<scope>runtime</scope>
 	</dependency>
 </dependencies>
@@ -46,7 +46,7 @@ Data must **NOT** contain POJO objects, only Collections (Maps, Lists, object ar
 
 ```gradle
 dependencies {
-	compile group: 'com.github.berkesa', name: 'datatree-templates', version: '1.0.1' 
+	compile group: 'com.github.berkesa', name: 'datatree-templates', version: '1.1.1' 
 }
 ```
 

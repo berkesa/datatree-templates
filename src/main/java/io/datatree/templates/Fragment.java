@@ -17,6 +17,10 @@
  */
 package io.datatree.templates;
 
+import java.util.function.BiConsumer;
+
+import io.datatree.Tree;
+
 /**
  * A document-fragment (root tag, and sub-fragments).
  */
@@ -39,6 +43,11 @@ public class Fragment {
 	 */
 	public String content;
 
+	/**
+	 * User-defined, optional function.
+	 */
+	public BiConsumer<StringBuilder, Tree> function;
+	
 	// --- SUB-FRAGMENTS ---
 
 	/**

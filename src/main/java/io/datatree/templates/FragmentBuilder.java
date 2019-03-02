@@ -18,22 +18,28 @@
 package io.datatree.templates;
 
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.function.BiConsumer;
+
+import io.datatree.Tree;
 
 /**
  * Template to Fragment converter / compiler.
  */
 public final class FragmentBuilder implements FragmentTypes {
 
-	public static final Fragment compile(String template, String templatePath, long lastModified) {
+	public static final Fragment compile(String template, String templatePath, long lastModified,
+			Map<String, BiConsumer<StringBuilder, Tree>> functions) {
 		Fragment root = new Fragment();
-		compile(template, root);
+		compile(template, root, functions);
 		root.arg = templatePath;
 		root.content = Long.toString(lastModified);
 		return root;
 	}
 
-	private static final int compile(String template, Fragment command) {
+	private static final int compile(String template, Fragment command,
+			Map<String, BiConsumer<StringBuilder, Tree>> functions) {
 		int start = 0;
 		int end = template.indexOf("#{");
 		LinkedList<Fragment> treeCommands = new LinkedList<>();
@@ -75,7 +81,7 @@ public final class FragmentBuilder implements FragmentTypes {
 					// It is true that such an element exists
 					subCommand.type = CONDITION_TAG_EXISTS;
 					subCommand.arg = st.nextToken();
-					start += compile(subTemplate, subCommand);
+					start += compile(subTemplate, subCommand, functions);
 
 				} else if (commandType.startsWith("!ex")) {
 
@@ -83,7 +89,7 @@ public final class FragmentBuilder implements FragmentTypes {
 					// It is true that such an element does not exist
 					subCommand.type = CONDITION_TAG_NOT_EXISTS;
 					subCommand.arg = st.nextToken();
-					start += compile(subTemplate, subCommand);
+					start += compile(subTemplate, subCommand, functions);
 
 				} else if (commandType.startsWith("eq")) {
 
@@ -93,7 +99,7 @@ public final class FragmentBuilder implements FragmentTypes {
 					subCommand.type = CONDITION_TAG_VALUE_EQUALS;
 					subCommand.arg = st.nextToken();
 					subCommand.content = st.nextToken();
-					start += compile(subTemplate, subCommand);
+					start += compile(subTemplate, subCommand, functions);
 
 				} else if (commandType.startsWith("!eq")) {
 
@@ -103,8 +109,22 @@ public final class FragmentBuilder implements FragmentTypes {
 					subCommand.type = CONDITION_TAG_VALUE_NOT_EQUALS;
 					subCommand.arg = st.nextToken();
 					subCommand.content = st.nextToken();
-					start += compile(subTemplate, subCommand);
+					start += compile(subTemplate, subCommand, functions);
 
+				} else if (commandType.startsWith("fn") || commandType.startsWith("fu")) {
+
+					// #{fn name variable}
+					// Custom function with a node/structure
+					subCommand.type = FUNCTION;
+					subCommand.arg = st.nextToken();
+					if (st.hasMoreTokens()) {
+						subCommand.content = st.nextToken();
+					}
+					subCommand.function = functions.get(subCommand.arg);
+					if (subCommand.function == null) {
+						throw new IllegalArgumentException("Unknown function: " + subCommand.arg);
+					}
+					
 				} else if ("for".equals(commandType)) {
 
 					// #{for variable : array}...#{end}
@@ -119,7 +139,7 @@ public final class FragmentBuilder implements FragmentTypes {
 						// Colon is optional
 						subCommand.arg = st.nextToken();
 					}
-					start += compile(subTemplate, subCommand);
+					start += compile(subTemplate, subCommand, functions);
 
 				} else if ("end".equals(commandType)) {
 

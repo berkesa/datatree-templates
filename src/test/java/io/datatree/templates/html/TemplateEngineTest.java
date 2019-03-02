@@ -18,6 +18,7 @@
 package io.datatree.templates.html;
 
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.UUID;
 
@@ -179,7 +180,8 @@ public class TemplateEngineTest extends TestCase {
 		data.put("b", true);
 		data.put("c", "< & >");
 		data.put("d.e", "abc");
-
+		data.put("price", 123456789);
+		
 		Tree table = data.putList("table");
 		for (int i = 0; i < 10; i++) {
 			Tree row = table.addMap();
@@ -187,6 +189,20 @@ public class TemplateEngineTest extends TestCase {
 			row.put("second", i % 2 == 0);
 			row.put("third", i);
 		}
+		
+		// Create
+		// #{fn currency price}
+		engine.addFunction("currency", (out, node) -> {
+			if (node == null) {
+				return;
+			}
+			double value = node.asDouble();
+			
+			// In production mode this would be too slow,
+			// use cached DecimalFormat (eg. in a ThreadLocale)
+			String formatted = DecimalFormat.getCurrencyInstance().format(value);
+			out.append(formatted);
+		});
 		
 		String html = process("template.html", data);
 		assertTrue(html.contains("A: 1"));

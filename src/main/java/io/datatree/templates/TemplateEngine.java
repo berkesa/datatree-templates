@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import io.datatree.Tree;
@@ -38,6 +39,7 @@ import io.datatree.dom.Cache;
  * 4.) Insert if a value exists or does not exist<br>
  * 5.) Insert if a value is the same or different from the specified value<br>
  * 6.) Can be used to generate txt, html, xhtml, xml files<br>
+ * 7.) User-defined functions (special HTML-formatters and renderers)<br>
  * <br>
  * Sub-template insertion:<br>
  * <br>
@@ -118,6 +120,14 @@ import io.datatree.dom.Cache;
  * #{!eq email admin@foo.com}<br>
  * The administrator email address is not specified.<br>
  * #{end}<br>
+ * <br>
+ * Invoke custom function:<br>
+ * <br>
+ * #{function myFunction email}<br>
+ * <br>
+ * Shorter syntax with "fn", parameter is optional:<br>
+ * <br>
+ * #{fn myFunction}<br>
  */
 public class TemplateEngine implements FragmentTypes {
 
@@ -163,6 +173,16 @@ public class TemplateEngine implements FragmentTypes {
 	 */
 	protected Function<String, String> templatePreProcessor;
 
+	/**
+	 * Custom, user-defined functions (special HTML renderers or formatters).
+	 */
+	protected Map<String, BiConsumer<StringBuilder, Tree>> functions = new HashMap<>();
+
+	/**
+	 * Cached StringBuilders.
+	 */
+	protected ThreadLocal<StringBuilder> builders = new ThreadLocal<>();
+	
 	// --- CONSTRUCTORS ---
 
 	public TemplateEngine() {
@@ -210,7 +230,13 @@ public class TemplateEngine implements FragmentTypes {
 	 *             any I/O or syntax exteption
 	 */
 	public String process(String templatePath, Tree data) throws IOException {
-		StringBuilder builder = new StringBuilder(writeBufferSize);
+		StringBuilder builder = builders.get();
+		if (builder == null) {
+			builder = new StringBuilder(writeBufferSize);
+			builders.set(builder);
+		} else {
+			builder.setLength(0);
+		}
 		String path = getAbsolutePath(templatePath);
 		transform(path, builder, getTemplate(path), data, null);
 		return builder.toString();
@@ -228,7 +254,7 @@ public class TemplateEngine implements FragmentTypes {
 	 *            source (~= HTML source and tags)
 	 */
 	public void define(String templatePath, String templateSource) {
-		Fragment template = FragmentBuilder.compile(templateSource, templatePath, 1);
+		Fragment template = FragmentBuilder.compile(templateSource, templatePath, 1, functions);
 		cache.put(templatePath, template);
 	}
 
@@ -263,6 +289,15 @@ public class TemplateEngine implements FragmentTypes {
 		cache.clear();
 	}
 
+	// --- CUSTOM FUNCTIONS / HTML RENDERERS ---
+
+	public void addFunction(String name, BiConsumer<StringBuilder, Tree> function) {
+		if (name == null || name.isEmpty() || name.contains(" ")) {
+			throw new IllegalArgumentException("Invalid function name:" + name);
+		}
+		functions.put(name, Objects.requireNonNull(function));
+	}
+
 	// --- PROTECTED METHODS ---
 
 	protected Fragment getTemplate(String templatePath) throws IOException {
@@ -279,7 +314,7 @@ public class TemplateEngine implements FragmentTypes {
 				source = templatePreProcessor.apply(source);
 			}
 			long lastModified = loader.lastModified(templatePath);
-			template = FragmentBuilder.compile(source, templatePath, lastModified);
+			template = FragmentBuilder.compile(source, templatePath, lastModified, functions);
 			cache.put(templatePath, template);
 		}
 		return template;
@@ -365,6 +400,16 @@ public class TemplateEngine implements FragmentTypes {
 				return;
 			}
 			transform(subTemplatePath, builder, include, root, variables);
+			break;
+
+		case FUNCTION:
+			if (command.content == null) {
+				command.function.accept(builder, current);
+			} else {
+				command.function.accept(builder, current.get(command.content));
+			}
+			break;
+
 		default:
 			break;
 		}

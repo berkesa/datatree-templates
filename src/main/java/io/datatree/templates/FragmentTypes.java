@@ -37,16 +37,19 @@ public interface FragmentTypes {
 	// #{!ex variable}
 	public static final byte CONDITION_TAG_NOT_EXISTS = 4;
 
-	// #{eq variable}
+	// #{eq variable value}
 	public static final byte CONDITION_TAG_VALUE_EQUALS = 5;
 
-	// #{!eq variable}
+	// #{!eq variable value}
 	public static final byte CONDITION_TAG_VALUE_NOT_EQUALS = 6;
 
-	// #{for variable}
+	// #{for child : parent}
 	public static final byte FOR_CYCLE = 7;
 
 	// #{in path}
 	public static final byte INSERTABLE_TEMPLATE_FILE = 8;
+	
+	// #{fn name variable}
+	public static final byte FUNCTION = 9;
 	
 }

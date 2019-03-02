@@ -9,6 +9,22 @@ Small and fast template engine capable of producing html, xml, and plain text fi
 The template engine works with hierarchical collection structures (cannot be used with POJO classes).
 Its operating logic is very simple - similar to the Mustache Engine - which makes it pretty fast.
 
+![Performance](https://raw.githubusercontent.com/berkesa/datatree-templates/master/docs/chart.png)
+
+## Capabilities
+ 
+- Sub-templates (header/footer) insertion
+- Simple insertion (multiple levels with JSON-path "user.address[2].city")
+- Loop on elements of a JSON array/map (for creating tables and lists)
+- Insert if a value exists or does not exist
+- Insert if a value is the same or different from the specified value
+- Can be used to generate TXT, HTML, XHTML or XML files (character escaping)
+- User-defined functions/macros (special HTML-formatters and renderers)
+
+## Limitations
+
+Data must NOT contain POJO objects, only Collections (Maps, Lists, object arrays) with primitive types and Strings (or any object that can be easily converted to String). The contents of a POJO object can only be inserted into the templates with user-defined functions.
+
 ## Download
 
 **Maven**
@@ -77,8 +93,43 @@ engine.setLoader(new CustomResourceLoader());
 Template Preprocessor runs after the loader loads a template. If the cache is enabled (~= engine.setReloadable(false)), it will only run once per template. For example, this feature can be used to minimize HTML-pages.
 
 ```java
+import io.datatree.templates.SimpleHtmlMinifier;
+
+// ...
+
 TemplateEngine engine = new TemplateEngine();
 engine.setTemplatePreProcessor(new SimpleHtmlMinifier());
+```
+
+The following example shows how to embed Google Minfier API as a preprocessor:
+
+```java
+public class GoogleHtmlMinifier extends HtmlCompressor implements Function<String, String> {
+
+	public GoogleHtmlMinifier() {
+		setCompressCss(true);
+		setCompressJavaScript(true);
+	}
+
+	@Override
+	public String apply(String text) {
+		if (text == null || text.isEmpty()) {
+			return text;
+		}
+		return compress(text);
+	}
+}
+
+// Use the minifier:
+TemplateEngine engine = new TemplateEngine();
+engine.setTemplatePreProcessor(new GoogleHtmlMinifier());
+```
+
+The following two dependency is required for the example above:
+
+```java
+compile group: 'com.googlecode.htmlcompressor', name: 'htmlcompressor', version: '1.5.2'
+compile group: 'com.yahoo.platform.yui', name: 'yuicompressor', version: '2.4.8'
 ```
 
 ### Template syntax
@@ -199,6 +250,36 @@ Shorter syntax with "!eq":
 #{!eq email admin@foo.com}
 	The administrator email address is not specified.
 #{end}
+```
+
+Invoke user-defined renderer / function:
+
+```html
+#{function formatEmail email}
+```
+
+Create the "formatEmail" function:
+
+```java
+engine.addFunction("formatEmail", (out, data) -> {
+  if (data != null) {
+    out.append(data.asString().replace("@", "[at]");
+  }
+});
+```
+
+Shorter syntax with "fn", parameter is optional:
+
+```html
+#{fn time}
+```
+
+Create the "time" function:
+
+```java
+engine.addFunction("time", (out, data) -> {
+  out.append(new Date());
+});
 ```
 
 ## License

@@ -19,6 +19,8 @@ package io.datatree.templates;
 
 import java.io.File;
 import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.util.Locale;
 import java.util.Map;
@@ -72,6 +74,7 @@ public class PerformanceTest {
 		}
 		long duration = System.currentTimeMillis() - start;
 		System.out.println("DataTree Templates: " + duration + " msec");
+		showPagePerSec(duration, max);
 		
 		// Freemarker
 		freemarker.template.Configuration e2 = new freemarker.template.Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
@@ -88,6 +91,7 @@ public class PerformanceTest {
 		}
 		duration = System.currentTimeMillis() - start;
 		System.out.println("FreeMarker: " + duration + " msec");
+		showPagePerSec(duration, max);
 		
 		// Jade
 		JadeConfiguration e3 = new JadeConfiguration();
@@ -108,6 +112,7 @@ public class PerformanceTest {
 		}
 		duration = System.currentTimeMillis() - start;
 		System.out.println("Jade: " + duration + " msec");
+		showPagePerSec(duration, max);
 		
 		// Mustache
 		DefaultMustacheFactory e4 = new DefaultMustacheFactory(new FileSystemResolver());
@@ -122,6 +127,7 @@ public class PerformanceTest {
 		}
 		duration = System.currentTimeMillis() - start;
 		System.out.println("Mustache: " + duration + " msec");
+		showPagePerSec(duration, max);
 		
 		// Pebble
 		FileLoader loader = new FileLoader();
@@ -137,6 +143,7 @@ public class PerformanceTest {
 		}
 		duration = System.currentTimeMillis() - start;
 		System.out.println("Pebble: " + duration + " msec");
+		showPagePerSec(duration, max);
 		
 		// Thymeleaf
 		org.thymeleaf.TemplateEngine e6 = new org.thymeleaf.TemplateEngine();
@@ -148,15 +155,25 @@ public class PerformanceTest {
 		for (int i = 0; i < 10; i++) {
 			rsp = thymeleafGen(map, e6);
 		}
-		System.out.println("Thymeleaf:\r\n"  + rsp);
+		// System.out.println("Thymeleaf:\r\n"  + rsp);
 		start = System.currentTimeMillis();
 		for (int i = 0; i < max; i++) {
 			rsp = thymeleafGen(map, e6);
 		}
 		duration = System.currentTimeMillis() - start;
 		System.out.println("Thymeleaf: " + duration + " msec");
+		showPagePerSec(duration, max);
 	}
 
+	private static final void showPagePerSec(long duration, long pages) {
+		BigDecimal time = new BigDecimal(duration);
+		BigDecimal count = new BigDecimal(pages);
+		BigDecimal onePageTime = time.divide(count);
+		BigDecimal oneSecInMsec = new BigDecimal(1000);
+		BigDecimal pagesPerSec = oneSecInMsec.divide(onePageTime, RoundingMode.HALF_UP);
+		System.out.println(pagesPerSec.longValue() + " pages/sec");
+	}
+	
 	private static final class CachingJadeLoader extends FileTemplateLoader {
 
 		public CachingJadeLoader(String folderPath, String encoding) {

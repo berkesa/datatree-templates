@@ -17,6 +17,8 @@
  */
 package io.datatree.templates;
 
+import java.text.DecimalFormat;
+
 import io.datatree.Tree;
 
 /**
@@ -33,6 +35,8 @@ public class Sample {
 		data.put("c", "< & >");
 		data.put("d.e", "abc");
 
+		data.put("price", 123456789);
+		
 		Tree table = data.putList("table");
 		for (int i = 0; i < 10; i++) {
 			Tree row = table.addMap();
@@ -49,6 +53,17 @@ public class Sample {
 		engine.setRootDirectory("/io/datatree/templates/html");
 		engine.setReloadTemplates(false);
 		engine.setTemplatePreProcessor(new SimpleHtmlMinifier());
+						
+		// Create
+		// #{fn currency price}
+		engine.addFunction("currency", (out, node) -> {
+			if (node == null) {
+				return;
+			}
+			double value = node.asDouble();
+			String formatted = DecimalFormat.getCurrencyInstance().format(value);
+			out.append(formatted);
+		});
 		
 		// Invoke Engine
 		String result = engine.process("template.html", data);

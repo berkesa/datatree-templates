@@ -5,11 +5,13 @@
 
 # Template Engine based on DataTree API
 
-Small and fast template engine capable of producing html, xml, and plain text files.
-The template engine works with hierarchical collection structures (cannot be used with POJO classes).
-Its operating logic is very simple - similar to the Mustache Engine - which makes it pretty fast.
+Small and fast template engine capable of producing html, xml, and plain text files. The template engine works with hierarchical collection structures - similar to the Mustache Engine but with expandable features. Its operating logic is very simple which makes it pretty fast:
 
-<p align="center">![Performance](https://raw.githubusercontent.com/berkesa/datatree-templates/master/docs/chart.png)</p>
+<p align="center">
+<a href="https://github.com/berkesa/datatree-templates/blob/master/src/test/java/io/datatree/templates/PerformanceTest.java">
+<img src="https://raw.githubusercontent.com/berkesa/datatree-templates/master/docs/chart.png">
+</a>
+</p>
 
 ## Capabilities
  
@@ -23,7 +25,7 @@ Its operating logic is very simple - similar to the Mustache Engine - which make
 
 ## Limitations
 
-Data must NOT contain POJO objects, only Collections (Maps, Lists, object arrays) with primitive types and Strings (or any object that can be easily converted to String). The contents of a POJO object can only be inserted into the templates with user-defined functions. No built-in multilingual support.
+Data must **NOT** contain POJO objects, only Collections (Maps, Lists, object arrays) with primitive types and Strings (or any object that can be easily converted to String). The contents of a POJO object can only be inserted into the templates with user-defined functions. No built-in multilingual support.
 
 ## Download
 
@@ -54,13 +56,13 @@ dependencies {
 
 ```java
 TemplateEngine engine = new TemplateEngine();
-engine.define("page.html", "Hello #{name} !");
+engine.define("page.html", "Hello #{name}!");
 
 Tree data = new Tree();
 data.put("name", "Tom");
 
-// The "out" contains "Hello Tom !" in UTF-8
-byte[] out = engine.process("page.html", data);
+// The "out" contains "Hello Tom!"
+String out = engine.process("page.html", data);
 ```
 
 ### Working from a directory
@@ -75,8 +77,8 @@ engine.setCharset(StandardCharsets.UTF_8);
 Map<String, Object> data = new HashMap<>();
 data.put("key", "value");
 
-// The "out" contains the "index.html" in UTF-8
-byte[] out = engine.process("index.html", data);
+// The "out" contains the merged "index.html"
+String out = engine.process("index.html", data);
 ```
 
 ### Using custom loader

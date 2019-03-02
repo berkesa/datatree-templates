@@ -1,8 +1,13 @@
 language: java
+dist: trusty
 
 jdk:
   - oraclejdk8
 
+cache:
+  directories:
+  - "$HOME/.gradle/caches" 
+  
 install: gradle wrapper --gradle-version 4.2
   
 before_install:

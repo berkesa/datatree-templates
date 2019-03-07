@@ -224,7 +224,7 @@ Paste if the value of the parameter is the same:
 
 ```html
 #{equals email admin@foo.com}
-	<!-- appears when the "email" parameter is "email admin@foo.com" -->
+	<!-- appears when the "email" parameter is "admin@foo.com" -->
 	An administrator email address is provided.
 #{end}
 ```
@@ -241,7 +241,7 @@ Paste if NOT the same value as the given value:
 
 ```html
 #{!equals email admin@foo.com}
-	<!-- appears when the "email" parameter is NOT "email admin@foo.com" -->
+	<!-- appears when the "email" parameter is NOT "admin@foo.com" -->
 	The administrator email address is not specified.
 #{end}
 ```

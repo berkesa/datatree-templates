@@ -28,7 +28,7 @@ jacocoTestReport {
     reports {
         xml.enabled true
         html.enabled true
-    }
+    } 
 }
 
 // --- CONFIGURATIONS ---
@@ -42,6 +42,16 @@ configurations.all {
     // resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
+// --- REPOSITORIES ---
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+}
+
+// --- SOURCE ---
+
 sourceSets {
 	main {
 		java {
@@ -51,14 +61,6 @@ sourceSets {
 			srcDirs= ["src/test/java"]
 		}
 	}
-}
-
-// --- REPOSITORIES ---
-
-repositories {
-    mavenCentral()
-    jcenter()
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
 }
 
 // --- DEPENDENCIES ---

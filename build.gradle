@@ -72,10 +72,15 @@ dependencies {
     testCompile 'junit:junit:4.12'
 	ecj 'org.eclipse.jdt.core.compiler:ecj:4.4.2'
 
+	// =============== TESTING ===============
+
+	// https://mvnrepository.com/artifact/com.openpojo/openpojo
+	testCompile group: 'com.openpojo', name: 'openpojo', version: '0.8.10'	
+
 	// ================== DATATREE CORE =======================
 	    
     // https://mvnrepository.com/artifact/com.github.berkesa/datatree-core
-	compile group: 'com.github.berkesa', name: 'datatree-core', version: '1.0.9'
+	compile group: 'com.github.berkesa', name: 'datatree-core', version: '1.0.10'
 	
 	// =========== TEMPLATE ENGINES FOR TESTING ===============
 	
@@ -111,7 +116,7 @@ targetCompatibility = 1.8
 
 group = 'com.github.berkesa'
 
-version = '1.1.1'
+version = '1.1.2'
   
 modifyPom {
     project {
@@ -139,7 +144,7 @@ modifyPom {
             dependency {
                 groupId 'com.github.berkesa'
                 artifactId 'datatree-core'
-                version '1.0.9'
+                version '1.0.10'
                 scope 'runtime'
             }        
         }
@@ -168,4 +173,11 @@ compileJava {
 		executable = 'java'
 		jvmArgs = ['-classpath', project.configurations.ecj.asPath, 'org.eclipse.jdt.internal.compiler.batch.Main', '-nowarn']
 	}
+}
+
+// --- JAR ---
+
+jar {
+    baseName = 'moleculer'
+    version =  '1.1.2'
 }

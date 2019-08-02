@@ -68,14 +68,14 @@ public final class FragmentBuilder implements FragmentTypes {
 				String commandType = st.nextToken().toLowerCase();
 				String subTemplate = template.substring(start);
 				boolean endTag = false;
-				if (commandType.startsWith("in")) {
+				if ("in".equals(commandType) || "include".equals(commandType)) {
 
 					// #{in path} or #{include path}
 					// File insertion (can be relative path)
 					subCommand.type = INSERTABLE_TEMPLATE_FILE;
 					subCommand.arg = st.nextToken().replace('\\', '/');
 
-				} else if (commandType.startsWith("ex")) {
+				} else if ("ex".equals(commandType) || "exists".equals(commandType)) {
 
 					// #{ex variable} or #{exists variable}...#{end}
 					// It is true that such an element exists
@@ -83,7 +83,7 @@ public final class FragmentBuilder implements FragmentTypes {
 					subCommand.arg = st.nextToken();
 					start += compile(subTemplate, subCommand, functions);
 
-				} else if (commandType.startsWith("!ex")) {
+				} else if ("!ex".equals(commandType) || "!exists".equals(commandType)) {
 
 					// #{!ex variable} or #{!exists variable}...#{end}
 					// It is true that such an element does not exist
@@ -91,7 +91,7 @@ public final class FragmentBuilder implements FragmentTypes {
 					subCommand.arg = st.nextToken();
 					start += compile(subTemplate, subCommand, functions);
 
-				} else if (commandType.startsWith("eq")) {
+				} else if ("eq".equals(commandType) || "equals".equals(commandType)) {
 
 					// #{eq variable 5} or #{equals variable 5}...#{end}
 					// It is true that the value of the variable matches the
@@ -101,7 +101,7 @@ public final class FragmentBuilder implements FragmentTypes {
 					subCommand.content = st.nextToken();
 					start += compile(subTemplate, subCommand, functions);
 
-				} else if (commandType.startsWith("!eq")) {
+				} else if ("!eq".equals(commandType) || "!equals".equals(commandType)) {
 
 					// #{!eq variable 5} or #{!equals variable 5}...#{end}
 					// It is true that the value of the variable does not match
@@ -111,9 +111,9 @@ public final class FragmentBuilder implements FragmentTypes {
 					subCommand.content = st.nextToken();
 					start += compile(subTemplate, subCommand, functions);
 
-				} else if (commandType.startsWith("fn") || commandType.startsWith("fu")) {
+				} else if ("fn".equals(commandType) || "function".equals(commandType)) {
 
-					// #{fn name variable}
+					// #{fn name variable} or #{function name variable}
 					// Custom function with a node/structure
 					subCommand.type = FUNCTION;
 					subCommand.arg = st.nextToken();

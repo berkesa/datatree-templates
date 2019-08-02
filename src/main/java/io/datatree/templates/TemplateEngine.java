@@ -397,7 +397,7 @@ public class TemplateEngine implements FragmentTypes {
 			String subTemplatePath = getAbsolutePath(basePath, command.arg);
 			Fragment include = getTemplate(subTemplatePath);
 			if (include == null) {
-				return;
+				throw new IllegalArgumentException("Missing template:" + subTemplatePath);
 			}
 			transform(subTemplatePath, builder, include, root, variables);
 			break;

@@ -165,6 +165,23 @@ public class TemplateEngineTest extends TestCase {
 		data.putList("n").add(1).add(2).add(3).add(4).add("X");
 		html = process(data);
 		assertTrue(html.contains("for:1234X:for"));
+		
+		// Throw error
+		try {
+			engine.addFunction(null, (out, node) -> {
+			});
+			fail();
+		} catch (IllegalArgumentException e1) {
+			// Ok!
+		}
+		try {
+			engine.addFunction("", (out, node) -> {
+			});
+			fail();
+		} catch (IllegalArgumentException e1) {
+			// Ok!
+		}
+		
 	}
 	
 	public String process(Tree data) throws Exception {

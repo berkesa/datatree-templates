@@ -67,7 +67,7 @@ public class PerformanceTest {
 		for (int i = 0; i < 10; i++) {
 			rsp = dataTreeGen(map, e1);
 		}
-		// System.out.println("DataTree Templates:\r\n"  + rsp);
+		System.out.println("DataTree Templates:\r\n"  + rsp);
 		long start = System.currentTimeMillis();
 		for (int i = 0; i < max; i++) {
 			rsp = dataTreeGen(map, e1);

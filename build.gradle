@@ -18,8 +18,9 @@ buildscript {
 
 javadoc {
 	options.encoding = 'UTF-8'
-	failOnError = true
+	failOnError = false
 	exclude "**/html/**"
+	exclude '**/PojoTest.java'
 }
 
 // --- JACOCO ---

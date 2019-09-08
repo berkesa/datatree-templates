@@ -153,7 +153,11 @@ public final class FragmentBuilder implements FragmentTypes {
 					// #{variable}
 					// Variable insertion
 					subCommand.type = INSERTABLE_VARIABLE;
-					subCommand.arg = commandType;
+					if (commandString.indexOf(' ') == -1) {
+						subCommand.arg = commandString;
+					} else {
+						subCommand.arg = new StringTokenizer(commandString).nextToken();
+					}
 
 				}
 				if (endTag) {

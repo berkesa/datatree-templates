@@ -340,7 +340,7 @@ public class TemplateEngine implements FragmentTypes {
 		switch (command.type) {
 		case STATIC_TEXT:
 			builder.append(command.content);
-			break;
+			return;
 
 		case INSERTABLE_VARIABLE:
 			String value = current.get(path, "");
@@ -351,7 +351,24 @@ public class TemplateEngine implements FragmentTypes {
 					builder.append(value);
 				}
 			}
-			break;
+			return;
+
+		case INSERTABLE_TEMPLATE_FILE:
+			String subTemplatePath = getAbsolutePath(basePath, command.arg);
+			Fragment include = getTemplate(subTemplatePath);
+			if (include == null) {
+				return;
+			}
+			transform(subTemplatePath, builder, include, root, variables);
+			return;
+
+		case FUNCTION:
+			if (command.content == null) {
+				command.function.accept(builder, current);
+			} else {
+				command.function.accept(builder, current.get(command.content));
+			}
+			return;
 
 		case FOR_CYCLE:
 			if (variables == null) {
@@ -366,7 +383,9 @@ public class TemplateEngine implements FragmentTypes {
 			}
 			variables = null;
 			return;
-
+			
+		// --- TAGS WITH "CHILDREN" ---
+			
 		case CONDITION_TAG_EXISTS:
 			if (current.get(path) == null) {
 				return;
@@ -390,23 +409,6 @@ public class TemplateEngine implements FragmentTypes {
 			value = current.get(path, "");
 			if (value.equals(command.content)) {
 				return;
-			}
-			break;
-
-		case INSERTABLE_TEMPLATE_FILE:
-			String subTemplatePath = getAbsolutePath(basePath, command.arg);
-			Fragment include = getTemplate(subTemplatePath);
-			if (include == null) {
-				throw new IllegalArgumentException("Missing template:" + subTemplatePath);
-			}
-			transform(subTemplatePath, builder, include, root, variables);
-			break;
-
-		case FUNCTION:
-			if (command.content == null) {
-				command.function.accept(builder, current);
-			} else {
-				command.function.accept(builder, current.get(command.content));
 			}
 			break;
 

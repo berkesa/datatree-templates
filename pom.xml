@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.github.berkesa</groupId>
+	<artifactId>datatree-templates</artifactId>
+	<version>2.0.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>DataTree Templates</name>
+	<description>Small, fast server-side template engine based on the DataTree API.</description>
+	<url>https://berkesa.github.io/datatree-templates/</url>
+	<inceptionYear>2019</inceptionYear>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>berkesa</id>
+			<name>Andras Berkes</name>
+			<email>andras.berkes@programmer.net</email>
+		</developer>
+	</developers>
+
+	<scm>
+		<url>https://github.com/berkesa/datatree-templates</url>
+		<connection>scm:git:https://github.com/berkesa/datatree-templates.git</connection>
+		<developerConnection>scm:git:git://github.com/berkesa/datatree-templates.git</developerConnection>
+	</scm>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.compiler.release>21</maven.compiler.release>
+
+		<!-- Dependency versions -->
+		<datatree.version>2.0.0-SNAPSHOT</datatree.version>
+		<junit.version>5.14.4</junit.version>
+
+		<!-- Test-only comparison template engines (benchmark in PerformanceTest) -->
+		<freemarker.version>2.3.34</freemarker.version>
+		<mustache.version>0.9.14</mustache.version>
+		<thymeleaf.version>3.1.5.RELEASE</thymeleaf.version>
+		<pebble.version>3.2.4</pebble.version>
+		<openpojo.version>0.9.1</openpojo.version>
+
+		<!-- Build plugin versions -->
+		<maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
+		<maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
+		<maven-source-plugin.version>3.3.1</maven-source-plugin.version>
+		<maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
+		<maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
+		<central-publishing-plugin.version>0.9.0</central-publishing-plugin.version>
+	</properties>
+
+	<dependencies>
+
+		<!-- DATATREE CORE API (the only runtime dependency) -->
+		<dependency>
+			<groupId>com.github.berkesa</groupId>
+			<artifactId>datatree-core</artifactId>
+			<version>${datatree.version}</version>
+		</dependency>
+
+		<!-- JUNIT 5 (JUPITER) -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- OPENPOJO (bean-convention validation in PojoTest) -->
+		<dependency>
+			<groupId>com.openpojo</groupId>
+			<artifactId>openpojo</artifactId>
+			<version>${openpojo.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- ============================================================ -->
+		<!-- Comparison template engines used ONLY by PerformanceTest to  -->
+		<!-- benchmark this engine. They are test-scoped and must NOT be  -->
+		<!-- runtime dependencies of the published library.               -->
+		<!-- ============================================================ -->
+
+		<!-- FREEMARKER -->
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+			<version>${freemarker.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- MUSTACHE -->
+		<dependency>
+			<groupId>com.github.spullara.mustache.java</groupId>
+			<artifactId>compiler</artifactId>
+			<version>${mustache.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- THYMELEAF -->
+		<dependency>
+			<groupId>org.thymeleaf</groupId>
+			<artifactId>thymeleaf</artifactId>
+			<version>${thymeleaf.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- PEBBLE (groupId moved to io.pebbletemplates; package io.pebbletemplates.pebble) -->
+		<dependency>
+			<groupId>io.pebbletemplates</groupId>
+			<artifactId>pebble</artifactId>
+			<version>${pebble.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+
+		<!--
+			Source-layout quirk preserved from the old Gradle build
+			(main.resources.srcDirs = ["src/test/java"]): the template
+			fixtures (*.html, *.datatree, *.freemarker, ...) live next to the
+			test classes and are loaded from the classpath at test time. Map
+			them as TEST resources (not main resources) so they are on the
+			test classpath but do NOT ship in the published jar.
+		-->
+		<testResources>
+			<testResource>
+				<directory>src/test/java</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</testResource>
+		</testResources>
+
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire-plugin.version}</version>
+				<configuration>
+					<!-- PerformanceTest is a manual benchmark harness (has a
+					     main(), not @Test methods); keep it out of the build. -->
+					<excludes>
+						<exclude>**/PerformanceTest*</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+
+	<profiles>
+
+		<!-- Release profile: sources + javadoc + GPG signing + Central Portal publishing -->
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>${maven-source-plugin.version}</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>${maven-javadoc-plugin.version}</version>
+						<configuration>
+							<doclint>none</doclint>
+							<!-- Old Gradle javadoc excluded the html test fixtures
+							     package and PojoTest; replicate that here. -->
+							<excludePackageNames>io.datatree.templates.html</excludePackageNames>
+							<sourceFileExcludes>
+								<sourceFileExclude>**/PojoTest.java</sourceFileExclude>
+							</sourceFileExcludes>
+						</configuration>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>${maven-gpg-plugin.version}</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.sonatype.central</groupId>
+						<artifactId>central-publishing-maven-plugin</artifactId>
+						<version>${central-publishing-plugin.version}</version>
+						<extensions>true</extensions>
+						<configuration>
+							<publishingServerId>central</publishingServerId>
+						</configuration>
+					</plugin>
+
+				</plugins>
+			</build>
+		</profile>
+
+	</profiles>
+
+</project>

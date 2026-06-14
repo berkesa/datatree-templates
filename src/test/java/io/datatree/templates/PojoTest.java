@@ -30,7 +30,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.openpojo.random.RandomGenerator;
 import com.openpojo.random.service.RandomGeneratorService;
@@ -42,14 +43,12 @@ import com.openpojo.validation.ValidatorBuilder;
 import com.openpojo.validation.test.impl.GetterTester;
 import com.openpojo.validation.test.impl.SetterTester;
 
-import junit.framework.TestCase;
-
-public class PojoTest extends TestCase {
+public class PojoTest {
 
 	private Validator validator;
 	private PojoClassFilter filterTestClasses = new FilterTestClasses();
 
-	@Override
+	@BeforeEach
 	protected void setUp() throws Exception {
 		validator = ValidatorBuilder.create().with(new SetterTester()).with(new GetterTester()).build();
 		RandomGeneratorService service = ServiceRegistrar.getInstance().getRandomGeneratorService();

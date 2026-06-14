@@ -17,24 +17,30 @@
  */
 package io.datatree.templates.html;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.UUID;
 
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.datatree.Tree;
 import io.datatree.templates.SimpleHtmlMinifier;
 import io.datatree.templates.TemplateEngine;
-import junit.framework.TestCase;
 
 /**
  * Template Engine tests.
- * 
+ *
  * @author Andras Berkes [andras.berkes@programmer.net]
  */
-public class TemplateEngineTest extends TestCase {
+public class TemplateEngineTest {
 
 	TemplateEngine engine;
 
@@ -239,7 +245,7 @@ public class TemplateEngineTest extends TestCase {
 		return html1;
 	}
 
-	@Override
+	@BeforeEach
 	protected void setUp() throws Exception {
 		engine = new TemplateEngine();
 		engine.setRootDirectory("/io/datatree/templates/html");
@@ -248,7 +254,7 @@ public class TemplateEngineTest extends TestCase {
 		engine.setCharset(StandardCharsets.UTF_8);
 	}
 
-	@Override
+	@AfterEach
 	protected void tearDown() throws Exception {
 		engine = null;
 	}

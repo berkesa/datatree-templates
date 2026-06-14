@@ -1,3 +1,10 @@
-/bin/
-/build/
-/.gradle/
+target/
+.gradle/
+bin/
+build/
+*.class
+
+# Eclipse
+.settings/
+.classpath
+.project

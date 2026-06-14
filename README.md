@@ -13,10 +13,6 @@ Small and fast template engine capable of producing html, xml, and plain text fi
 </a>
 </p>
 
-## Documentation
-
-[![Documentation](https://raw.githubusercontent.com/berkesa/datatree/master/docs/docs-button.png)](https://berkesa.github.io/datatree/template-introduction.html)
-
 ## License
 
 DataTree-Templates is licensed under the Apache License V2, you can use it in your commercial products for free.

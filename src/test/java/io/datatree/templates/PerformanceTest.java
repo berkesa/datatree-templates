@@ -30,12 +30,9 @@ import org.thymeleaf.templateresolver.FileTemplateResolver;
 
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.resolver.FileSystemResolver;
-import com.mitchellbosecke.pebble.loader.FileLoader;
 
-import de.neuland.jade4j.Jade4J.Mode;
-import de.neuland.jade4j.JadeConfiguration;
-import de.neuland.jade4j.model.JadeModel;
-import de.neuland.jade4j.template.FileTemplateLoader;
+import io.pebbletemplates.pebble.loader.FileLoader;
+
 import freemarker.template.Configuration;
 import io.datatree.Tree;
 
@@ -93,30 +90,13 @@ public class PerformanceTest {
 		System.out.println("FreeMarker: " + duration + " msec");
 		showPagePerSec(duration, max);
 		
-		// Jade
-		JadeConfiguration e3 = new JadeConfiguration();
-		e3.setCaching(true);
-		e3.setPrettyPrint(false);
+		// Resolve the fixture directory (used by the Mustache, Pebble and Thymeleaf benchmarks below)
 		URL url = PerformanceTest.class.getResource("/io/datatree/templates/html/all.html");
-		e3.setMode(Mode.HTML);
 		String dir = new File(url.getFile()).getParent();
-		String name = dir + "/test.jade";
-		e3.setTemplateLoader(new CachingJadeLoader("", "UTF-8"));
-		for (int i = 0; i < 10; i++) {
-			rsp = jadeGen(name, map, e3);
-		}
-		// System.out.println("Jade:\r\n"  + rsp);
-		start = System.currentTimeMillis();
-		for (int i = 0; i < max; i++) {
-			rsp = jadeGen(name, map, e3);
-		}
-		duration = System.currentTimeMillis() - start;
-		System.out.println("Jade: " + duration + " msec");
-		showPagePerSec(duration, max);
-		
+
 		// Mustache
 		DefaultMustacheFactory e4 = new DefaultMustacheFactory(new FileSystemResolver());
-		name = dir + "/test.mustache";
+		String name = dir + "/test.mustache";
 		for (int i = 0; i < 10; i++) {
 			rsp = mustacheGen(name, map, e4);
 		}
@@ -132,7 +112,7 @@ public class PerformanceTest {
 		// Pebble
 		FileLoader loader = new FileLoader();
 		loader.setPrefix(dir);
-		com.mitchellbosecke.pebble.PebbleEngine e5 = new com.mitchellbosecke.pebble.PebbleEngine.Builder().cacheActive(true).loader(loader).build();
+		io.pebbletemplates.pebble.PebbleEngine e5 = new io.pebbletemplates.pebble.PebbleEngine.Builder().cacheActive(true).loader(loader).build();
 		for (int i = 0; i < 10; i++) {
 			rsp = pebbleGen(map, e5);
 		}
@@ -174,26 +154,13 @@ public class PerformanceTest {
 		System.out.println(pagesPerSec.longValue() + " pages/sec");
 	}
 	
-	private static final class CachingJadeLoader extends FileTemplateLoader {
-
-		public CachingJadeLoader(String folderPath, String encoding) {
-			super(folderPath, encoding);
-		}
-
-		@Override
-		public long getLastModified(String name) {
-			return 1;
-		}
-		
-	}
-	
 	private static final String thymeleafGen(Map<String, Object> map, org.thymeleaf.TemplateEngine e6) throws Exception {
 		StringWriter out = new StringWriter(2048);
 		e6.process("test.thymeleaf", new Context(Locale.ENGLISH, map), out);
 		return out.toString();
 	}
 
-	private static final String pebbleGen(Map<String, Object> map, com.mitchellbosecke.pebble.PebbleEngine e5) throws Exception {
+	private static final String pebbleGen(Map<String, Object> map, io.pebbletemplates.pebble.PebbleEngine e5) throws Exception {
 		StringWriter out = new StringWriter(2048);
 		e5.getTemplate("test.pebble").evaluate(out, map);
 		return out.toString();
@@ -214,11 +181,5 @@ public class PerformanceTest {
 		e2.getTemplate("test.freemarker").process(map, out);
 		return out.toString();
 	}
-	
-	private static final String jadeGen(String name, Map<String, Object> map, JadeConfiguration e3) throws Exception {
-		StringWriter out = new StringWriter(2048);
-		e3.getTemplate(name).process(new JadeModel(map), out);
-		return out.toString();
-	}
-	
+
 }

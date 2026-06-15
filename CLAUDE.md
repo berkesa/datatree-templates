@@ -25,17 +25,17 @@ mvn test -Dtest=TemplateEngineTest#testBase
 ```
 
 Notes:
-- Compilation uses plain `javac` via `maven-compiler-plugin`. (The legacy Gradle build forked the Eclipse compiler (ECJ); that is gone.)
+- Compilation uses plain `javac` via `maven-compiler-plugin`.
 - **`PerformanceTest` is excluded** from the normal test run (surefire `<excludes>**/PerformanceTest*</excludes>`). It is a manual JMH-style benchmark with a `main()` (DataTree vs. FreeMarker/Mustache/Thymeleaf/Pebble), not a unit test — run it by hand if needed.
 - Javadoc (under the `release` profile) excludes the `io.datatree.templates.html` fixtures package and `PojoTest`, with `<doclint>none</doclint>`.
 
-### Dependency scope (structural fix in 2.0.0)
+### Dependency scope
 
-The only **runtime/`compile`** dependency of the published library is `com.github.berkesa:datatree-core` (pinned to `2.0.0`). The comparison template engines (FreeMarker, Mustache, Thymeleaf, Pebble) and OpenPojo are **`test`-scoped** — they exist only to benchmark/validate and are *not* transitive dependencies of consumers. (The old Gradle build wrongly declared the engines as `compile`.) **Jade4j was dropped entirely** (dead upstream); its `PerformanceTest` benchmark path and the `test.jade` fixture were removed. Pebble moved groupId/package to `io.pebbletemplates(.pebble)`.
+The only **runtime/`compile`** dependency of the published library is `com.github.berkesa:datatree-core` (pinned to `2.0.0`). The comparison template engines (FreeMarker, Mustache, Thymeleaf, Pebble) and OpenPojo are **`test`-scoped** — they exist only to benchmark/validate and are *not* transitive dependencies of consumers.
 
 ### Source layout quirk
 
-Template fixtures used by tests (e.g. `*.html`, `*.datatree`, `*.freemarker`, `*.mustache`, `*.pebble`, `*.thymeleaf`) live **next to the test classes** under `src/test/java/io/datatree/templates/html/` and are loaded from the classpath via `getClass().getResource(...)`. The `pom.xml` maps them as **test resources** (`<testResources>` over `src/test/java`, excluding `**/*.java`) so they are on the test classpath but **do not ship in the published jar**. (The legacy Gradle build instead set `main.resources.srcDirs = ["src/test/java"]`, which bundled the fixtures into the main jar.)
+Template fixtures used by tests (e.g. `*.html`, `*.datatree`, `*.freemarker`, `*.mustache`, `*.pebble`, `*.thymeleaf`) live **next to the test classes** under `src/test/java/io/datatree/templates/html/` and are loaded from the classpath via `getClass().getResource(...)`. The `pom.xml` maps them as **test resources** (`<testResources>` over `src/test/java`, excluding `**/*.java`) so they are on the test classpath but **do not ship in the published jar**.
 
 ## Architecture
 

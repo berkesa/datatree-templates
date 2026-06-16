@@ -44,22 +44,12 @@ By design, the engine is intentionally minimal:
 
 ## Download
 
-Maven:
-
 ```xml
 <dependency>
     <groupId>com.github.berkesa</groupId>
     <artifactId>datatree-templates</artifactId>
     <version>2.0.0</version>
 </dependency>
-```
-
-Gradle:
-
-```gradle
-dependencies {
-    implementation 'com.github.berkesa:datatree-templates:2.0.0'
-}
 ```
 
 This pulls in `datatree-core` (the `Tree` type) transitively.

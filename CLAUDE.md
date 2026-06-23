@@ -12,7 +12,7 @@ Maven project (`pom.xml`); compiled with `javac` targeting **Java 11** (`<maven.
 
 ```bash
 mvn clean verify           # compile + run unit tests (the definition-of-done gate)
-mvn clean install          # also installs 2.0.0-SNAPSHOT to the local ~/.m2 repo
+mvn clean install          # also installs 2.0.0 to the local ~/.m2 repo
 mvn test                   # run all unit tests
 mvn -Prelease verify       # additionally builds sources + javadoc jars and GPG-signs (publishing)
 ```

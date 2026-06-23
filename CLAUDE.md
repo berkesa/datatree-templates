@@ -8,7 +8,7 @@ DataTree Templates is a small, fast server-side template engine for producing HT
 
 ## Build & Test
 
-Maven project (`pom.xml`); compiled with `javac` targeting **Java 21** (`<maven.compiler.release>21</maven.compiler.release>`). Build with `mvn`.
+Maven project (`pom.xml`); compiled with `javac` targeting **Java 11** (`<maven.compiler.release>11</maven.compiler.release>`). Minimum consumer runtime: **JDK 11**. Build JDK: 17+ (JDK 25 in use). Build with `mvn`.
 
 ```bash
 mvn clean verify           # compile + run unit tests (the definition-of-done gate)

@@ -288,7 +288,7 @@ System.out.println(result);
 
 ## Requirements
 
-Java 21 or newer. The only runtime dependency is `datatree-core`.
+Java 11 or newer. The only runtime dependency is `datatree-core`.
 
 ## License
 

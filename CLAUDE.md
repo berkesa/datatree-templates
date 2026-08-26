@@ -12,7 +12,7 @@ Maven project (`pom.xml`); compiled with `javac` targeting **Java 11** (`<maven.
 
 ```bash
 mvn clean verify           # compile + run unit tests (the definition-of-done gate)
-mvn clean install          # also installs 2.0.0 to the local ~/.m2 repo
+mvn clean install          # also installs 2.1.0 to the local ~/.m2 repo
 mvn test                   # run all unit tests
 mvn -Prelease verify       # additionally builds sources + javadoc jars and GPG-signs (publishing)
 ```
@@ -31,7 +31,7 @@ Notes:
 
 ### Dependency scope
 
-The only **runtime/`compile`** dependency of the published library is `com.github.berkesa:datatree-core` (pinned to `2.0.0`). The comparison template engines (FreeMarker, Mustache, Thymeleaf, Pebble) and OpenPojo are **`test`-scoped** — they exist only to benchmark/validate and are *not* transitive dependencies of consumers.
+The only **runtime/`compile`** dependency of the published library is `com.github.berkesa:datatree-core` (pinned to `2.1.0`). The comparison template engines (FreeMarker, Mustache, Thymeleaf, Pebble) and OpenPojo are **`test`-scoped** — they exist only to benchmark/validate and are *not* transitive dependencies of consumers.
 
 ### Source layout quirk
 
